@@ -14,13 +14,14 @@ import {CourseLessons} from "../../entities/course-lessons.entity";
 import {CourseLessonCreateAdminDto} from "../../dtos/course-lessons/admin/course-lesson.create.admin.dto";
 import {CourseLessonUpdateAdminDto} from "../../dtos/course-lessons/admin/course-lesson.update.admin.dto";
 import {CourseLessonsAdminService} from "../../services/course-lessons/course-lessons.admin.service";
-import {ApiBearerAuth} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
+import { CourseLessonListAdminDto } from '../../dtos/course-lessons/admin/course-lesson.list.admin.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -30,11 +31,13 @@ export class CourseLessonsAdminController{
 
     constructor(private readonly courseLessonsService: CourseLessonsAdminService) {}
 
+    @ApiOkResponse({type: [CourseLessonListAdminDto], isArray: true})
     @Get("list")
     async getAll(){
         return this.courseLessonsService.getAll()
     }
 
+    @ApiOkResponse({type: [CourseLessonListAdminDto]})
     @Get(":id")
     async getOne(@Param("id") id: string){
         return this.courseLessonsService.getOne(id)

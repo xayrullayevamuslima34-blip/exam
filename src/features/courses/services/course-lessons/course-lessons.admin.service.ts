@@ -2,10 +2,18 @@ import {Body, Injectable, NotFoundException, Param} from "@nestjs/common";
 import {CourseLessons} from "../../entities/course-lessons.entity";
 import {CourseLessonCreateAdminDto} from "../../dtos/course-lessons/admin/course-lesson.create.admin.dto";
 import {CourseLessonUpdateAdminDto} from "../../dtos/course-lessons/admin/course-lesson.update.admin.dto";
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CourseLessonsAdminService{
+
+    constructor(private readonly config: ConfigService) {}
+
     async getAll(){
+        const rawCourseLessons = await CourseLessons.find()
+        for (let courseLesson of rawCourseLessons){
+            courseLesson.video = this.config.getOrThrow<string>('BASE_URL')
+        }
         return await CourseLessons.find()
     }
 

@@ -3,11 +3,21 @@ import {Countries} from "../entities/countries.entity";
 import {CountryCreateAdminDto} from "../dtos/admin/country.create.admin.dto";
 import {CountryUpdateAdminDto} from "../dtos/admin/country.update.admin.dto";
 import {Difficulty} from "../../difficulties/entities/difficulty.entity";
+import { ConfigService } from '@nestjs/config';
+import { plainToInstance } from 'class-transformer';
+import { CountryListAdminDto } from '../dtos/admin/country.list.admin.dto';
 
 @Injectable()
 export class CountriesAdminService{
+
+    constructor(private readonly config: ConfigService) {}
+
     async getAll(){
-        return Countries.find()
+        const rawCountries = await Countries.find()
+        for (const country of rawCountries){
+            country.flag = this.config.getOrThrow<string>('BASE_URL')
+        }
+        return plainToInstance(CountryListAdminDto, rawCountries)
     }
 
     async getOne(id: string){

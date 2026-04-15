@@ -6,10 +6,15 @@ import {JwtModule} from "@nestjs/jwt";
 import {jwtConfig} from "../../config/jwt.config";
 import {AuthenticationAdminController} from "./auth/controller/authentication.admin.controller";
 import {AuthenticationAdminService} from "./auth/services/user/authentication.admin.service";
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
     imports: [
-        JwtModule.register(jwtConfig)
+        JwtModule.registerAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: jwtConfig,
+        }),
     ],
 
     controllers: [AuthenticationAdminController, AuthenticationPublicController],

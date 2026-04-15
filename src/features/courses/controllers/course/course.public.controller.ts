@@ -1,8 +1,11 @@
-import {Controller, Get, Param, ParseIntPipe, Req, UseGuards} from "@nestjs/common";
+import {Controller, Get, Param, ParseIntPipe, Query, Req, UseGuards} from "@nestjs/common";
 import {CoursePublicService} from "../../services/course/course.public.service";
 import type {Request} from "express";
 import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
 import {RolesGuard} from "../../../../core/guards/role.guard";
+import { CourseFilter } from '../../filters/course.filter';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { PaginationResultCourseDto } from '../../filters/pagination-result.course.dto';
 
 @UseGuards(AuthenticationGuard, RolesGuard)
 @Controller("public/courses")
@@ -11,14 +14,18 @@ export class CoursePublicController{
     constructor(private readonly courseService: CoursePublicService) {}
 
     @Get("list")
-    async getAll(@Req() request: Request){
+    @ApiOkResponse({type: () => PaginationResultCourseDto, isArray: true})
+    async getAll(@Req() request: Request, @Query() filter: CourseFilter){
         let userId = undefined
         //@ts-ignore
         if (request.user){
             //@ts-ignore
             userId = request.user.id
         }
-        return this.courseService.getAll(userId)
+
+    const course = await this.courseService.getAll(filter, userId)
+
+        return course
     }
 
     @Get(":id")

@@ -12,13 +12,14 @@ import {
 import {CountriesAdminService} from "../services/countries.admin.service";
 import {CountryUpdateAdminDto} from "../dtos/admin/country.update.admin.dto";
 import {CountryCreateAdminDto} from "../dtos/admin/country.create.admin.dto";
-import {ApiBearerAuth} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
+import { CountryListAdminDto } from '../dtos/admin/country.list.admin.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -28,11 +29,13 @@ export class CountriesAdminController{
 
     constructor(private readonly countryService: CountriesAdminService) {}
 
+    @ApiOkResponse({type: [CountryListAdminDto], isArray: true})
     @Get("list")
     async getAll(){
         return this.countryService.getAll()
     }
 
+    @ApiOkResponse({type: [CountryListAdminDto]})
     @Get(":id")
     async getOne(@Param("id") id: string){
         return this.countryService.getOne(id)

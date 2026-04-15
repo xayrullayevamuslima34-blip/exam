@@ -5,10 +5,7 @@ import {SignInDto} from "../dtos/user/public/sign-in.dto";
 import {VerifyOtpDto} from "../dtos/user/public/verify-otp.dto";
 import {ResendOtpDto} from "../dtos/user/public/resend-otp.dto";
 import {SetPasswordDto} from "../dtos/user/public/set-password.dto";
-import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
-import {RolesGuard} from "../../../../core/guards/role.guard";
 
-@UseGuards(AuthenticationGuard, RolesGuard)
 @Controller('auth')
 export class AuthenticationPublicController{
     constructor(private readonly authService: AuthenticationPublicService) {}

@@ -1,26 +1,33 @@
-import 'dotenv/config'
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {ValidationPipe} from "@nestjs/common";
-import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
-import {join} from "path"
-import {NestExpressApplication} from "@nestjs/platform-express";
+import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
+import { GlobalFilter } from './core/filters/global.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  }))
+  const configService = app.get(ConfigService);
 
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {prefix: '/fayllar/'})
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }));
 
-  const swaggerConfig = new DocumentBuilder().setTitle("UzChess").addBearerAuth().setVersion("1.0.0").build()
+  app.useGlobalFilters(new GlobalFilter());
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/fayllar/' });
+
+  const swaggerConfig = new DocumentBuilder().setTitle('UzChess').addBearerAuth().setVersion('1.0.0').build();
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('/docs', app, swaggerDoc)
+  SwaggerModule.setup('/docs', app, swaggerDoc);
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = configService.get<number>('PORT') ?? 3000;
+  await app.listen(port);
 }
 
 bootstrap();

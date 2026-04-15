@@ -1,11 +1,9 @@
-import {Body, Controller, Post, UseGuards} from '@nestjs/common';
-import {UserCreateAdminDto} from "../dtos/user/admin/user.create.admin.dto";
-import {UserLoginAdminDto} from "../dtos/user/admin/user.login.admin.dto";
-import {AuthenticationAdminService} from "../services/user/authentication.admin.service";
-import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
-import {RolesGuard} from "../../../../core/guards/role.guard";
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { UserCreateAdminDto } from '../dtos/user/admin/user.create.admin.dto';
+import { UserLoginAdminDto } from '../dtos/user/admin/user.login.admin.dto';
+import { AuthenticationAdminService } from '../services/user/authentication.admin.service';
 
-@UseGuards(AuthenticationGuard, RolesGuard)
+
 @Controller('admin/auth')
 export class AuthenticationAdminController {
     constructor(private service: AuthenticationAdminService) {}

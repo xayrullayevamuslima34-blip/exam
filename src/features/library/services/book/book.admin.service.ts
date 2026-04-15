@@ -2,10 +2,18 @@ import {Body, Injectable, NotFoundException, Param, UploadedFile} from "@nestjs/
 import {Book} from "../../entities/book.entity";
 import {BookCreateAdminDto} from "../../dtos/book/admin/book.create.admin.dto";
 import {BookUpdateAdminDto} from "../../dtos/book/admin/book.update.admin.dto";
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BookAdminService{
+
+    constructor(private readonly config: ConfigService) {}
+
     async getAll(){
+        const rawBook = await Book.find();
+        for await (const book of rawBook){
+            book.image = this.config.getOrThrow<string>('BASE_URL')
+        }
         return await Book.find()
     }
 

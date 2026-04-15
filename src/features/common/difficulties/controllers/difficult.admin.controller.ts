@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common";
 import {DifficultyCreateAdminDto} from "../dtos/admin/difficulty.create.admin.dto";
 import {DifficultyAdminService} from "../services/difficult.admin.service";
-import {ApiBearerAuth, ApiConsumes} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiConsumes, ApiOkResponse } from '@nestjs/swagger';
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
 import {DifficultyUpdateAdminDto} from "../dtos/admin/difficulty.update.admin.dto";
@@ -20,6 +20,7 @@ import {AuthenticationGuard} from "../../../../core/guards/authentication.guard"
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
+import { DifficultiesListAdminDto } from '../dtos/admin/difficulty.list.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -29,11 +30,13 @@ export class DifficultyAdminController{
 
     constructor(private readonly difficultService: DifficultyAdminService) {}
 
+    @ApiOkResponse({type: [DifficultiesListAdminDto]})
     @Get("list")
     async getAll(){
         return this.difficultService.getAll()
     }
 
+    @ApiOkResponse({type: [DifficultiesListAdminDto]})
     @Get(":id")
     async getOne(@Param("id") id: string){
        return this.difficultService.getOne(id)

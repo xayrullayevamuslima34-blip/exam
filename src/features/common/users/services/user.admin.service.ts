@@ -2,11 +2,21 @@ import {Body, Injectable, NotFoundException, Param} from "@nestjs/common";
 import {Users} from "../entities/user.entity";
 import {UsersCreateAdminDto} from "../dtos/admin/user.create.admin.dto";
 import {UsersUpdateAdminDto} from "../dtos/admin/user.update.admin.dto";
+import { ConfigService } from '@nestjs/config';
+import { plainToInstance } from 'class-transformer';
+import { UsersListAdminDto } from '../dtos/admin/user.list.admin.dto';
 
 @Injectable()
 export class UsersAdminService{
+
+    constructor(private readonly config: ConfigService) {}
+
     async getAll(){
-        return await Users.find()
+        const rawUsers = await Users.find()
+        for (let user of rawUsers){
+            user.profileImage = this.config.getOrThrow<string>('BASE_URL')
+        }
+        return plainToInstance(UsersListAdminDto, rawUsers)
     }
 
     async getOne(@Param("id") id: string){

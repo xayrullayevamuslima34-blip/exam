@@ -4,8 +4,12 @@ import {NewsCreateAdminDto} from "../../dtos/news/admin/news.create.admin.dto";;
 import {NewsListAdminDto} from "../../dtos/news/admin/news.list.admin.dto";
 import {NewsUpdateAdminDto} from "../../dtos/news/admin/news.update.admin.dto";
 import {News} from "../../entities/news.entity";
+import { ConfigService } from '@nestjs/config';
 
 export class NewsAdminService{
+
+    constructor(private readonly config: ConfigService) {}
+
     async create(payload: NewsCreateAdminDto, image: Express.Multer.File){
         const news = News.create({...payload, image: image.path})
         news.createdAt = (new Date()).toISOString()
@@ -14,9 +18,11 @@ export class NewsAdminService{
     }
 
     async getAll(){
-        const news = await News.find()
-        const data = plainToInstance(NewsListAdminDto, news, {excludeExtraneousValues: true})
-        return news
+        const rawNews = await News.find()
+        for (const news of await News.find()){
+            news.image = this.config.getOrThrow<string>('BASE_URL')
+        }
+        return plainToInstance(NewsListAdminDto, rawNews)
     }
 
     async getOne(id: number){

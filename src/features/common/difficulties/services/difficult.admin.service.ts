@@ -2,11 +2,21 @@ import {BadRequestException, Body, Injectable, NotFoundException, Param} from "@
 import {Difficulty} from "../entities/difficulty.entity";
 import {DifficultyCreateAdminDto} from "../dtos/admin/difficulty.create.admin.dto";
 import {DifficultyUpdateAdminDto} from "../dtos/admin/difficulty.update.admin.dto";
+import {ConfigService} from "@nestjs/config";
+import {plainToInstance} from "class-transformer";
+import {DifficultiesListAdminDto} from "../dtos/admin/difficulty.list.dto";
 
 @Injectable()
 export class DifficultyAdminService{
+
+    constructor(private readonly config: ConfigService) {}
+
     async getAll(){
-        return await Difficulty.find()
+        const rawDifficulties = await Difficulty.find()
+        for (let difficulty of rawDifficulties){
+            difficulty.icon=this.config.getOrThrow<string>('BASE_URL')+'/'+difficulty.icon
+        }
+        return plainToInstance(DifficultiesListAdminDto, rawDifficulties)
     }
 
     async getOne(@Param("id") id: string){

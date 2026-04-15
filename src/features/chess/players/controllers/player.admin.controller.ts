@@ -14,13 +14,14 @@ import {Player} from "../entities/player.entity";
 import {PlayerCreateAdminDto} from "../dtos/admin/player.create.admin.dto";
 import {PlayerUpdateAdminDto} from "../dtos/admin/player.update.admin.dto";
 import {PlayerAdminService} from "../service/player.admin.service";
-import {ApiBearerAuth} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
+import { PlayerListAdminDto } from '../dtos/admin/player.list.admin.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -30,11 +31,13 @@ export class PlayerAdminController{
 
     constructor(private readonly playerService: PlayerAdminService) {}
 
+    @ApiOkResponse({type: [PlayerListAdminDto], isArray: true})
     @Get("list")
     async getAll(){
         return this.playerService.getAll()
     }
 
+    @ApiOkResponse({type: [PlayerListAdminDto]})
     @Get(":id")
     async getOne(@Param("id") id: string){
         return this.playerService.getOne(id)

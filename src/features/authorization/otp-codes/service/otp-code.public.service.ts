@@ -2,9 +2,13 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import {User} from "../../auth/entities/authentication.entity";
 import {OtpType} from "../../../../core/enums/otp-type.enum";
 import {OtpCode} from "../entities/otp-codes.entity";
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OtpCodePublicService {
+
+    constructor(private readonly config: ConfigService) {}
+
     async sendOtp(user: User, type: OtpType) {
         await this.deleteOtps(user.id);
 
@@ -16,7 +20,6 @@ export class OtpCodePublicService {
 
         await OtpCode.save(otpCode);
         console.log(otpCode);
-        // TODO: otpni haqiqiy send qilish shu yerda bo'ladi
     }
 
     async verifyOtp(userId: number, code: string) {
@@ -26,7 +29,7 @@ export class OtpCodePublicService {
             throw new BadRequestException('Codes do not match');
         }
 
-        let otpExpire = Number(process.env.OTP_EXPIRE) * 1000;
+        let otpExpire = this.config.getOrThrow<number>('OTP_EXPIRE') * 1000;
         let difference = Date.now() - Date.parse(otpCode.createdAt);
         if (difference > otpExpire) {
             throw new BadRequestException('Code expired');

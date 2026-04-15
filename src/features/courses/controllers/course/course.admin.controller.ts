@@ -17,11 +17,12 @@ import {CourseAdminService} from "../../services/course/course.admin.service";
 import type {Request} from "express";
 import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
 import {RolesGuard} from "../../../../core/guards/role.guard";
-import {ApiBearerAuth} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
+import { CourseListAdminDto } from '../../dtos/courses/admin/course.list.admin.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -31,6 +32,7 @@ export class CourseAdminController{
 
     constructor(private readonly courseService: CourseAdminService) {}
 
+    @ApiOkResponse({type: [CourseListAdminDto], isArray: true})
     @Get("list")
     async getAll(@Req() request: Request){
         let userId = undefined
@@ -42,6 +44,7 @@ export class CourseAdminController{
         return this.courseService.getAll(userId)
     }
 
+    @ApiOkResponse({type: [CourseListAdminDto]})
     @Get(":id")
     async getOne(@Param(":id") id: string){
         return this.courseService.getOne(id)

@@ -8,8 +8,8 @@ import {
     Patch,
     UseGuards,
     UseInterceptors,
-    UploadedFile
-} from "@nestjs/common";
+    UploadedFile, Query,
+} from '@nestjs/common';
 import {NewsCreateAdminDto} from "../../dtos/news/admin/news.create.admin.dto";
 import {NewsUpdateAdminDto} from "../../dtos/news/admin/news.update.admin.dto";
 import {ApiBearerAuth, ApiOkResponse} from "@nestjs/swagger";
@@ -21,6 +21,7 @@ import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
+import { NewsFilter } from '../../filters/news.filter';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -39,10 +40,11 @@ export class NewsAdminController {
 
     @Get()
     @ApiOkResponse({type: () => NewsListAdminDto, isArray: true})
-    async getAll(){
+    async getAll(@Query() filters: NewsFilter){
         return await this.service.getAll()
     }
 
+    @ApiOkResponse({type: [NewsListAdminDto]})
     @Get(':id')
     async getOne(@Param('id') id: number){
         return await this.service.getOne(id)

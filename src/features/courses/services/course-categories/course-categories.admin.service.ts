@@ -23,7 +23,7 @@ export class CourseCategoriesAdminService{
         return category
     }
 
-    async update(@Param("id") id: string, @Body() payload: CourseCategoriesUpdateAdminDto){
+    async update(id: string, payload: CourseCategoriesUpdateAdminDto){
         const category = await CourseCategories.findOneBy({id: +id})
         if (!category){
             throw new NotFoundException("Course category not found")

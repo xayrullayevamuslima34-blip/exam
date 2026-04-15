@@ -13,11 +13,21 @@ import {PlayerUpdateAdminDto} from "../dtos/admin/player.update.admin.dto";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
 import {Difficulty} from "../../../common/difficulties/entities/difficulty.entity";
+import { PlayerListAdminDto } from '../dtos/admin/player.list.admin.dto';
+import { ConfigService } from '@nestjs/config';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class PlayerAdminService{
+
+    constructor(private readonly config: ConfigService) {}
+
     async getAll(){
-        return Player.find()
+        const rawPlayers = await Player.find()
+        for (const player of rawPlayers){
+            player.image = this.config.getOrThrow<string>('BASE_URL')
+        }
+        return plainToInstance(PlayerListAdminDto, rawPlayers)
     }
 
     async getOne(@Param("id") id: string){

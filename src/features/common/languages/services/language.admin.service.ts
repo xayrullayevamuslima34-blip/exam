@@ -14,6 +14,7 @@ export class LanguageAdminService{
         if(!language){
             throw new NotFoundException("Language not found")
         }
+        return language
     }
 
     async create(@Body() payload: LanguageCreateAdminDto){

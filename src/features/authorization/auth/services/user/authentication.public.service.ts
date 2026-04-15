@@ -11,15 +11,18 @@ import {OtpCode} from "../../../otp-codes/entities/otp-codes.entity";
 import {ResendOtpDto} from "../../dtos/user/public/resend-otp.dto";
 import {User} from "../../entities/authentication.entity";
 import {OtpCodePublicService} from "../../../otp-codes/service/otp-code.public.service";
+import { ConfigService } from '@nestjs/config';
 
 // SolihCoder@gmail.com
 // solihcoder@gmail.com
 
 @Injectable()
 export class AuthenticationPublicService {
+
     constructor(
         private readonly jwtService: JwtService,
         private readonly otpService: OtpCodePublicService,
+        private readonly config: ConfigService
     ) {
     }
 
@@ -104,7 +107,7 @@ export class AuthenticationPublicService {
             throw new NotFoundException('User with given login and loginType does not exist');
         }
 
-        let otpExpire = Number(process.env.OTP_EXPIRE) * 1000;
+        let otpExpire = this.config.getOrThrow<number>('OTP_RESEND') * 1000;
 
         let lastOtp = await OtpCode.findOne({
             where: { userId: user.id },

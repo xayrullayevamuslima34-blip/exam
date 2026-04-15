@@ -4,9 +4,13 @@ import {CourseCreateAdminDto} from "../../dtos/courses/admin/course.create.admin
 import {CourseUpdateAdminDto} from "../../dtos/courses/admin/course.update.admin.dto";
 import {plainToInstance} from "class-transformer";
 import {CourseListAdminDto} from "../../dtos/courses/admin/course.list.admin.dto";
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CourseAdminService{
+
+    constructor(private readonly config: ConfigService) {}
+
     async getAll(userId?: number) {
         const courses = await Course.createQueryBuilder("courses")
             .leftJoinAndSelect("courses.likes", "likes", "likes.userId = userId", [userId, userId])
@@ -21,6 +25,11 @@ export class CourseAdminService{
         //     where: whereOptions,
         // })
         //
+
+        const rawCourses = await Course.find()
+        for (let course of rawCourses){
+            course.image = this.config.getOrThrow<string>('BASE_URL')
+        }
 
         if (userId) {
             for (const course of courses) {

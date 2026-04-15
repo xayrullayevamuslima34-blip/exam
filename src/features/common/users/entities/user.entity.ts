@@ -8,6 +8,9 @@ import {CourseReviews} from "../../../courses/entities/course-reviews.entity";
 import {PurchasedCourses} from "../../../courses/entities/purchased-courses.entity";
 import {CourseUserLessons} from "../../../courses/entities/course-user-lessons.entity";
 import {OtpCode} from "../../../authorization/otp-codes/entities/otp-codes.entity";
+import { SouvenirLikes } from '../../../souvenirs/entities/souvenirLikes.entity';
+import { SouvenirReviews } from '../../../souvenirs/entities/souvenirReviews.entity';
+import { CartItems } from '../../../cart/entities/cart.entity';
 
 @Entity("users")
 export class Users extends BaseModel {
@@ -55,4 +58,14 @@ export class Users extends BaseModel {
 
     @OneToMany(() => OtpCode, (otpCode) => otpCode.user)
     otpCodes?: OtpCode[];
+
+    @OneToMany(() => CartItems , (cart) => cart.user)
+    carts?: CartItems[];
+
+    @OneToMany(() => SouvenirLikes, (souvenirLikes) => souvenirLikes.user)
+    souvenirLikes?: SouvenirLikes[];
+
+    @OneToMany(() => SouvenirReviews , (souvenirReview ) => souvenirReview.user)
+    souvenirReview?: SouvenirReviews[];
+
 }

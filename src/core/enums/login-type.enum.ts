@@ -1,4 +1,4 @@
-export enum LoginType{
-    Phone = "phone",
-    Email = "email"
+export enum LoginType {
+  Phone = 'phone',
+  Email = 'email'
 }

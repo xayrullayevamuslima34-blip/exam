@@ -13,13 +13,15 @@ import {
 import {UsersCreateAdminDto} from "../dtos/admin/user.create.admin.dto";
 import {UsersUpdateAdminDto} from "../dtos/admin/user.update.admin.dto";
 import {UsersAdminService} from "../services/user.admin.service";
-import {ApiBearerAuth} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
+import { type } from 'node:os';
+import { UsersListAdminDto } from '../dtos/admin/user.list.admin.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -29,11 +31,13 @@ export class UsersAdminController{
 
     constructor(private readonly userService: UsersAdminService) {}
 
+    @ApiOkResponse({type: [UsersListAdminDto], isArray: true})
     @Get("list")
     async getAll(){
         return this.userService.getAll()
     }
 
+    @ApiOkResponse({type: [UsersListAdminDto]})
     @Get(":id")
     async getOne(@Param("id") id: string){
         return this.userService.getOne(id)
