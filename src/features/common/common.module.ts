@@ -26,6 +26,10 @@ import { AuthorsPublicService } from './author/services/author.public.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { jwtConfig } from '../../config/jwt.config';
+import { ColorAdminController } from './colors/controllers/color.admin.controller';
+import { ColorPublicController } from './colors/controllers/color.public.controller';
+import { ColorAdminService } from './colors/services/color.admin.servic';
+import { ColorPublicService } from './colors/services/color.public.servic';
 
 @Module({
   imports: [
@@ -41,7 +45,9 @@ import { jwtConfig } from '../../config/jwt.config';
     DifficultyAdminController, DifficultyPublicController,
     LanguageAdminController, LanguagePublicController,
     TermsAdminController, TermsPublicController,
-    UsersAdminController, UsersPublicController],
+    UsersAdminController, UsersPublicController,
+    ColorAdminController, ColorPublicController,
+  ],
 
 
   providers: [AuthorsAdminService, AuthorsPublicService,
@@ -49,7 +55,9 @@ import { jwtConfig } from '../../config/jwt.config';
     DifficultyAdminService, DifficultyPublicService,
     LanguageAdminService, LanguagePublicService,
     TermsAdminService, TermsPublicService,
-    UsersAdminService, UsersPublicService],
+    UsersAdminService, UsersPublicService,
+    ColorAdminService, ColorPublicService,
+  ],
 })
 
 export class CommonModule {

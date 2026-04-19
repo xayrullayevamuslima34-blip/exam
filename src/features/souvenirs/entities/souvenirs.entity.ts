@@ -14,7 +14,7 @@ export class Souvenirs extends BaseModel{
   description!: string;
 
   @Column({type: 'decimal', precision: 12, scale: 2})
-  price!: number
+  price!: number;
 
   @OneToMany(() => SouvenirImages, (souvenirImage) => souvenirImage.souvenir)
   souvenirImage?: SouvenirImages[];

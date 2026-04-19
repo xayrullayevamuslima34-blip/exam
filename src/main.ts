@@ -31,3 +31,5 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+//umumiy 64 ta API

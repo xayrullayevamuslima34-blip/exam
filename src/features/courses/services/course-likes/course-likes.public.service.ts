@@ -9,8 +9,8 @@ export class CourseLikesPublicService{
         return await CourseLikes.find()
     }
 
-    async getOne(@Param("id") id:string){
-        const like = await CourseLikes.findOneBy({id: +id})
+    async getOne(id:number){
+        const like = await CourseLikes.findOneBy({id: id})
         if (!like){
             throw new NotFoundException("Course not found")
         }

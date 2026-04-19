@@ -3,7 +3,7 @@ import { CartItemsPublicService } from '../services/cartItems.public.service';
 import { CartItemCreatePublicDto } from '../dtos/cart/public/cart-item.create.public.dto';
 import { CartItemUpdatePublicDto } from '../dtos/cart/public/cart-item.update.public.dto';
 
-@Controller()
+@Controller("public/cartItems")
 export class CartItemsPublicController{
 
   constructor(private readonly cartService: CartItemsPublicService) {

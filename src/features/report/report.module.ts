@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ReportsAdminController } from './reports/controllers/reports.admin.controller';
-import { BookReviewPublicController } from '../library/controllers/book-review/book-review.public.controller';
 import { ReportsAdminService } from './reports/service/reports.admin.service';
 import { ReportsPublicController } from './reports/controllers/reports.public.controller';
 import { ReportsPublicService } from './reports/service/reports.public.service';

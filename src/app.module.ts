@@ -14,6 +14,8 @@ import { CommonModule } from './features/common/common.module';
 import { AuthorizationModule } from './features/authorization/authorization.module';
 import { ReportModule } from './features/report/report.module';
 import { ChessModule } from './features/chess/chess.module';
+import { CartModule } from './features/cart/cart.module';
+import { SouvenirsModule } from './features/souvenirs/souvenir.module';
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { ChessModule } from './features/chess/chess.module';
     LibraryModule,
     NewsModule,
     ReportModule,
+    CartModule,
+    SouvenirsModule,
   ],
 })
 export class AppModule {

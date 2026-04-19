@@ -5,11 +5,11 @@ import { Souvenirs } from './souvenirs.entity';
 @Entity('souvenirImages')
 export class SouvenirImages extends BaseModel{
   @Column()
-  souvenirId: number;
+  souvenirId!: number;
 
   @ManyToOne(() => Souvenirs, (souvenirs) => souvenirs.souvenirImage)
   @JoinColumn({name: 'souvenirId'})
-  souvenir: Souvenirs;
+  souvenir!: Souvenirs;
 
   @Column({length: 128})
   image: string;

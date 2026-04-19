@@ -1,0 +1,22 @@
+services:
+  uzchess-backend:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8008:8008"
+    restart: always
+    container_name: uzchess
+    networks:
+      - uzchess
+  db:
+    image: postgres:18-apline
+    env_file:
+      - .env
+    container_name: postgress-db
+    networks:
+      - uzchess
+
+networks:
+  uzchess:
+    driver: bridge

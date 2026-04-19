@@ -4,7 +4,7 @@ import { ColorCreateAdminDto } from '../dtos/admin/color.create.admin.dto';
 import { ColorUpdateAdminDto } from '../dtos/admin/color.update.admin.dto';
 
 @Controller('admin/colors')
-class ColorAdminController {
+export class ColorAdminController {
 
   constructor(private readonly colorService: ColorAdminService) {
   }
