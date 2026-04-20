@@ -1,6 +1,8 @@
 services:
   uzchess-backend:
     build: .
+    command: >
+      sh -c "npm run migrate && node dist/main.js"
     env_file:
       - .env
     ports:
@@ -9,13 +11,22 @@ services:
     container_name: uzchess
     networks:
       - uzchess
+    volumes:
+      - uploads:/app/uploads/
+
   db:
-    image: postgres:18-apline
+    image: postgres:18-alpine
     env_file:
       - .env
-    container_name: postgress-db
+    container_name: postgres-db
     networks:
       - uzchess
+    volumes:
+      - uzchess:/var/lib/postgresql/data
+
+volumes:
+  uzchess:
+  uploads:
 
 networks:
   uzchess:

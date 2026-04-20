@@ -10,9 +10,13 @@ import { NewsViewsPublicService } from './services/news-views/news-views.public.
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConfig } from '../../config/jwt.config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { News } from './entities/news.entity';
+import { NewsAdminRepository } from './repositories/news/news.admin.repository';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([News]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -23,6 +27,7 @@ import { jwtConfig } from '../../config/jwt.config';
     NewsViewsAdminController, NewsViewsPublicController],
 
   providers: [NewsAdminService, NewsPublicService,
+    NewsAdminRepository,
     NewsViewsAdminService, NewsViewsPublicService],
 })
 export class NewsModule {

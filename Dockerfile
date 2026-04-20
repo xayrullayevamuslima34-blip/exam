@@ -12,13 +12,11 @@ COPY . .
 
 RUN npm run build
 
-#//RUN npm run migrate
+#RUN npm run migrate
 
-CMD ["node", "dist/main.js"]
+#CMD ["npm", "run migrate", "node",  "dist/main.js"]
 
-#//keyin terminalda wsl        / T
+#docker build -t uzchess:0.1.0 .    / T
 
-#//docker build -t uzchess:0.1.0 .    / T
-
-#//docker image ls  / yaratilgan docerni ko'rish    /T
+#docker image ls  / yaratilgan docerni ko'rish    /T
 

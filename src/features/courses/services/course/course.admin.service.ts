@@ -20,12 +20,6 @@ export class CourseAdminService{
             .leftJoinAndSelect("courses.language", "language")
             .getMany()
 
-        // const courses = await Course.find({
-        //     relations: ["author", "category", "language", "difficulty", "likes"],
-        //     where: whereOptions,
-        // })
-        //
-
         const rawCourses = await Course.find()
         for (let course of rawCourses){
             course.image = this.config.getOrThrow<string>('BASE_URL')
@@ -33,14 +27,6 @@ export class CourseAdminService{
 
         if (userId) {
             for (const course of courses) {
-                // if (liked){
-                //     //@ts-ignore
-                //     course.isLiked = true
-                // }else {
-                //     //@ts-ignore
-                //     course.isLiked = false
-                // }
-
                 //@ts-ignore
                 course.isLiked = Boolean(course.likes?.length)
             }

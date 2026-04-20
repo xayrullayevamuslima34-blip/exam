@@ -18,9 +18,12 @@ import { BookReviewPublicService } from './services/book-review/book-review.publ
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { jwtConfig } from '../../config/jwt.config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Book } from './entities/book.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Book]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -32,16 +32,10 @@ export class NewsAdminController {
     constructor(private service: NewsAdminService) {
     }
 
-    @UseInterceptors(FileInterceptor("image", {storage: storageOptions}))
-    @Post()
-    async create(@Body() payload: NewsCreateAdminDto, @UploadedFile() image: Express.Multer.File){
-        return await this.service.create(payload, image)
-    }
-
     @Get()
-    @ApiOkResponse({type: () => NewsListAdminDto, isArray: true})
+    @ApiOkResponse({type: NewsListAdminDto, isArray: true})
     async getAll(@Query() filters: NewsFilter){
-        return await this.service.getAll()
+        return await this.service.getAll(filters)
     }
 
     @ApiOkResponse({type: [NewsListAdminDto]})
@@ -50,13 +44,19 @@ export class NewsAdminController {
         return await this.service.getOne(id)
     }
 
+    @UseInterceptors(FileInterceptor("image", {storage: storageOptions}))
+    @Post()
+    async create(@Body() payload: NewsCreateAdminDto, @UploadedFile() image: Express.Multer.File){
+        return await this.service.create(payload, image)
+    }
+
     @UseInterceptors(FileInterceptor('image', {storage: storageOptions}))
     @Patch(':id')
     async update(@Param('id') id: number, @Body() payload: NewsUpdateAdminDto, @UploadedFile() image: Express.Multer.File){
         return await this.service.update(id, payload, image)
     }
 
-    @Delete('id')
+    @Delete(':id')
     async delete(@Param('id') id: number){
         return await this.service.delete(id)
     }

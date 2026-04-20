@@ -13,6 +13,10 @@ export class PaginationResultNewsDto {
 
   @ApiProperty()
   @Expose()
+  previousPage?: number;
+
+  @ApiProperty()
+  @Expose()
   nextPage?: number;
 
   @ApiProperty()

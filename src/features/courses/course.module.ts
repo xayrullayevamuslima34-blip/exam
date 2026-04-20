@@ -38,14 +38,19 @@ import { CourseSectionsPublicController } from './controllers/course-sections/co
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { jwtConfig } from '../../config/jwt.config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { CourseCategories } from './entities/course-categories.entity';
+import { Course } from './entities/course.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([CourseCategories, Course]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: jwtConfig,
-    }),
+    }
+      ),
   ],
   controllers: [CourseAdminController, CoursePublicController,
     CourseCategoriesAdminController, CourseCategoriesPublicController,

@@ -1,59 +1,69 @@
-import {plainToInstance} from "class-transformer";
-import {NotFoundException} from "@nestjs/common";
-import {NewsCreateAdminDto} from "../../dtos/news/admin/news.create.admin.dto";;
-import {NewsListAdminDto} from "../../dtos/news/admin/news.list.admin.dto";
-import {NewsUpdateAdminDto} from "../../dtos/news/admin/news.update.admin.dto";
-import {News} from "../../entities/news.entity";
+import { plainToInstance } from 'class-transformer';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { NewsCreateAdminDto } from '../../dtos/news/admin/news.create.admin.dto';
+import { NewsListAdminDto } from '../../dtos/news/admin/news.list.admin.dto';
+import { NewsUpdateAdminDto } from '../../dtos/news/admin/news.update.admin.dto';
+import { News } from '../../entities/news.entity';
 import { ConfigService } from '@nestjs/config';
+import { PaginationFilters } from '../../../../core/filters/pagination.filter';
+import { NewsAdminRepository } from '../../repositories/news/news.admin.repository';
+import { FindOptionsWhere, ILike } from 'typeorm';
+import { NewsFilter } from '../../filters/news.filter';
 
-export class NewsAdminService{
 
-    constructor(private readonly config: ConfigService) {}
+@Injectable()
+export class NewsAdminService {
 
-    async create(payload: NewsCreateAdminDto, image: Express.Multer.File){
-        const news = News.create({...payload, image: image.path})
-        news.createdAt = (new Date()).toISOString()
-        await News.save(news)
-        return news
+  constructor(private readonly config: ConfigService,
+              private readonly repo: NewsAdminRepository) {
+  }
+
+  async getAll(filters: NewsFilter) {
+    const rawNews = await this.repo.getAll(filters);
+
+    const baseUrl = this.config.getOrThrow<string>('BASE_URL');
+    rawNews.data = rawNews.data.map(news => ({
+      ...news,
+      image: news.image ? `${baseUrl}/${news.image}` : null
+    }));
+
+    rawNews.data = plainToInstance(NewsListAdminDto, rawNews.data, { excludeExtraneousValues: true });
+    return rawNews;
+  }
+
+  async getOne(id: number) {
+    const news = await this.repo.getOneById(id);
+    if (!news) {
+      throw new NotFoundException('News with given id not found');
+    }
+    return plainToInstance(NewsListAdminDto, news, { excludeExtraneousValues: true });
+  }
+
+  async create(payload: NewsCreateAdminDto, image: Express.Multer.File) {
+    const news = { ...payload, image: image.path } as News;
+    news.createdAt = (new Date()).toISOString();
+    return this.repo.save(news);
+  }
+
+  async update(id: number, payload: NewsUpdateAdminDto, image: Express.Multer.File) {
+    const news = await this.repo.getOneById(id);
+    if (!news) {
+      throw new NotFoundException('News with given id not found');
     }
 
-    async getAll(){
-        const rawNews = await News.find()
-        for (const news of await News.find()){
-            news.image = this.config.getOrThrow<string>('BASE_URL')
-        }
-        return plainToInstance(NewsListAdminDto, rawNews)
-    }
+    Object.assign(
+      news,
+      Object.fromEntries(
+        Object.entries(payload).filter(([_, value]) => value !== undefined && value !== null),
+      ));
+    return await this.repo.save(news);
+  }
 
-    async getOne(id: number){
-        const news = await News.findOneBy({id: id})
-        if(!news){
-            throw new NotFoundException('News with given id not found')
-        }
-        return news
+  async delete(id: number) {
+    const news = await this.repo.getOneById(id);
+    if (!news) {
+      throw new NotFoundException('News with given id not found');
     }
-
-    async update(id: number, payload: NewsUpdateAdminDto, image: Express.Multer.File){
-        const news = await News.findOneBy({id})
-        if(!news){
-            throw new NotFoundException('News with given id not found')
-        }
-
-        Object.assign(
-            news,
-            Object.fromEntries(
-                Object.entries(payload).filter(([key, value]) => value)
-            ))
-        await News.save(news)
-        return news
-    }
-
-    async delete(id: number){
-        const news = await News.findOneBy({id})
-        if(!news){
-            throw new NotFoundException('News with given id not found')
-        }
-        await News.remove(news)
-    }
+    return this.repo.delete(news);
+  }
 }
-
