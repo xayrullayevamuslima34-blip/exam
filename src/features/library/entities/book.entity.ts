@@ -1,8 +1,8 @@
 import {Column, Entity, JoinColumn, ManyToOne, OneToMany} from "typeorm";
 import {BaseModel} from "../../../core/base-module";
-import {Author} from "../../common/author/entities/author.entity";
-import {Language} from "../../common/languages/entities/language.entity";
-import {Difficulty} from "../../common/difficulties/entities/difficulty.entity";
+import {Author} from "../../common/entities/author.entity";
+import {Language} from "../../common/entities/language.entity";
+import {Difficulty} from "../../common/entities/difficulty.entity";
 import {BookCategory} from "./book-category.entity";
 import {BookReview} from "./book-review.entity";
 import {BookLike} from "./book-like.entity";

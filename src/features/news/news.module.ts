@@ -7,27 +7,25 @@ import { NewsViewsAdminService } from './services/news-views/news-views.admin.se
 import { NewsViewsAdminController } from './controllers/news-views/news-views.admin.controller';
 import { NewsViewsPublicController } from './controllers/news-views/news-views.public.controller';
 import { NewsViewsPublicService } from './services/news-views/news-views.public.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
-import { jwtConfig } from '../../config/jwt.config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { NewsRepository } from './repositories/news.repository';
 import { News } from './entities/news.entity';
-import { NewsAdminRepository } from './repositories/news/news.admin.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { NewsViews } from './entities/news-views.entity';
+import { NewsViewsRepository } from './repositories/news-views.repository';
+
 
 @Module({
+
   imports: [
-    TypeOrmModule.forFeature([News]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: jwtConfig,
-    }),
+    TypeOrmModule.forFeature([News, NewsViews]),
   ],
+
+
   controllers: [NewsAdminController, NewsPublicController,
     NewsViewsAdminController, NewsViewsPublicController],
 
   providers: [NewsAdminService, NewsPublicService,
-    NewsAdminRepository,
+    NewsRepository, NewsViewsRepository,
     NewsViewsAdminService, NewsViewsPublicService],
 })
 export class NewsModule {

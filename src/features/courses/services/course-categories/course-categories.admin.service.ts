@@ -1,45 +1,50 @@
-import {Body, Injectable, NotFoundException, Param} from "@nestjs/common";
-import {CourseCategories} from "../../entities/course-categories.entity";
-import {CourseCategoriesCreateAdminDto} from "../../dtos/course-categories/admin/course-categories.create.admin.dto";
-import {CourseCategoriesUpdateAdminDto} from "../../dtos/course-categories/admin/course-categories.update.admin.dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CourseCategories } from '../../entities/course-categories.entity';
+import { CourseCategoriesCreateAdminDto } from '../../dtos/course-categories/admin/course-categories.create.admin.dto';
+import { CourseCategoriesUpdateAdminDto } from '../../dtos/course-categories/admin/course-categories.update.admin.dto';
+import { CourseCategoriesFilter } from '../../filters/course-categories.filter';
+import { ConfigService } from '@nestjs/config';
+import { CourseCategoriesRepository } from '../../repositories/course-categories.repository';
 
 @Injectable()
-export class CourseCategoriesAdminService{
-    async getAll(){
-        return await CourseCategories.find()
-    }
+export class CourseCategoriesAdminService {
 
-    async getOne(@Param("id") id: string){
-        const category = await CourseCategories.findOneBy({id: +id})
-        if (!category){
-            throw new NotFoundException("Course category not found")
-        }
-        return category
-    }
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: CourseCategoriesRepository) {
+  }
 
-    async create(@Body() payload: CourseCategoriesCreateAdminDto){
-        const category = CourseCategories.create(payload as CourseCategories)
-        await CourseCategories.save(category)
-        return category
-    }
+  async getAll(filter: CourseCategoriesFilter) {
+    return await this.repo.getAll(filter);
+  }
 
-    async update(id: string, payload: CourseCategoriesUpdateAdminDto){
-        const category = await CourseCategories.findOneBy({id: +id})
-        if (!category){
-            throw new NotFoundException("Course category not found")
-        }
-        Object.assign(category, payload)
-        await CourseCategories.save(category)
-        return category
+  async getOne(id: number) {
+    const category = await this.repo.getOneById(id);
+    if (!category) {
+      throw new NotFoundException('Course category not found');
     }
+    return category;
+  }
 
-    async delete(@Param("id") id: string){
-        const category = await CourseCategories.findOneBy({id: +id})
-        if(!category){
-            throw new NotFoundException("Course category not found")
-        }
-        await CourseCategories.remove(category)
-        return category
+  async create(payload: CourseCategoriesCreateAdminDto) {
+    const category = CourseCategories.create(payload as CourseCategories);
+    return await this.repo.save(category);
+  }
+
+  async update(id: number, payload: CourseCategoriesUpdateAdminDto) {
+    const category = await this.repo.getOneById(id);
+    if (!category) {
+      throw new NotFoundException('Course category not found');
     }
+    Object.assign(category, payload);
+    return await this.repo.save(category);
+  }
+
+  async delete(id: number) {
+    const category = await this.repo.getOneById(id);
+    if (!category) {
+      throw new NotFoundException('Course category not found');
+    }
+    return await this.repo.delete(category);
+  }
 
 }

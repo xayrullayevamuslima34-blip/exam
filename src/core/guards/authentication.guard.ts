@@ -3,6 +3,7 @@ import {JwtService} from "@nestjs/jwt";
 import {Reflector} from "@nestjs/core";
 import {Observable} from "rxjs";
 import {Request} from "express";
+import { Roles, RolesDecorator } from '../decorators/roles.decorator';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate{
@@ -12,10 +13,10 @@ export class AuthenticationGuard implements CanActivate{
     ) {}
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        // let roles = this.reflector.getAllAndOverride(RolesKey, [context.getHandler(), context.getClass()])
-        // if (!roles) {
-        //     return true
-        // }
+        let roles = this.reflector.getAllAndOverride(RolesDecorator ,[context.getHandler(), context.getClass()])
+        if (!roles) {
+            return true
+        }
 
         let request: Request = context.switchToHttp().getRequest()
         if (!request.headers.authorization) {
@@ -24,7 +25,7 @@ export class AuthenticationGuard implements CanActivate{
 
         let [bearer, token] = request.headers.authorization.split(' ')
 
-        if (bearer.toLocaleLowerCase() !== 'bearer'){
+        if (bearer.toLowerCase() !== 'bearer'){
             throw new UnauthorizedException("Unauthorized")
         }
 

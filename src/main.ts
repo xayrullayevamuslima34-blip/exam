@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { join } from 'path';
+import morgan from 'morgan'
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { GlobalFilter } from './core/filters/global.filter';
@@ -17,10 +18,13 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
+      transform: true,
     }));
 
+  app.use(morgan('dev'))
+
   app.useGlobalFilters(new GlobalFilter());
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/fayllar/' });
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads/' });
 
   const swaggerConfig = new DocumentBuilder().setTitle('UzChess').addBearerAuth().setVersion('1.0.0').build();
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig);
@@ -31,5 +35,7 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+
 
 //umumiy 64 ta API

@@ -1,13 +1,11 @@
-import {Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, UseGuards} from "@nestjs/common";
-import {PurchasedCourses} from "../../entities/purchased-courses.entity";
-import {PurchasedCourseCreatePublicDto} from "../../dtos/purchased-courses/public/purchased-course.create.public.dto";
-import {PurchasedCourseUpdatePublicDto} from "../../dtos/purchased-courses/public/purchased-course.update.public.dto";
+import {Controller, Delete, Get, Param, Query, UseGuards} from "@nestjs/common";
 import {PurchasedCoursesAdminService} from "../../services/purchased-courses/purchased-courses.admin.service";
 import {ApiBearerAuth} from "@nestjs/swagger";
 import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
+import { PurchasedCoursesFilter } from '../../filters/purchased-courses.filter';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -18,17 +16,17 @@ export class PurchasedCourseAdminController{
     constructor(private readonly purchasedCourseService: PurchasedCoursesAdminService) {}
 
     @Get("list")
-    async getAll(){
-        return this.purchasedCourseService.getAll()
+    async getAll(@Query() filter: PurchasedCoursesFilter){
+        return this.purchasedCourseService.getAll(filter)
     }
 
     @Get(":id")
-    async getOne(@Param(":id") id: string){
+    async getOne(@Param(":id") id: number){
         return this.purchasedCourseService.getOne(id)
     }
 
     @Delete("delete/:id")
-    async delete(@Param("id") id: string){
+    async delete(@Param("id") id: number){
         return this.purchasedCourseService.delete(id)
     }
 

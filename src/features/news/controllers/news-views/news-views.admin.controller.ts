@@ -1,15 +1,13 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Patch, Post, Query} from "@nestjs/common";
 import {NewsViewsCreateAdminDto} from "../../dtos/news-views/admin/news-views.create.admin.dto";
 import {NewsViewsUpdateAdminDto} from "../../dtos/news-views/admin/news-views.update.admin.dto";
 import {NewsViewsAdminService} from "../../services/news-views/news-views.admin.service";
 import {ApiBearerAuth} from "@nestjs/swagger";
-import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
-import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
+import { NewsViewsFilter } from '../../filters/newsViews.filter';
 
 @ApiBearerAuth()
-@UseGuards(AuthenticationGuard, RolesGuard)
 @Roles(Role.Admin)
 @Controller("admin/news-views")
 export class NewsViewsAdminController{
@@ -17,12 +15,12 @@ export class NewsViewsAdminController{
     constructor(private readonly newsViewsService: NewsViewsAdminService) {}
 
     @Get("list")
-    async getAll(){
-        return this.newsViewsService.getAll()
+    async getAll(@Query() filter: NewsViewsFilter){
+        return this.newsViewsService.getAll(filter)
     }
 
     @Get(":id")
-    async getOne(@Param("id") id: string){
+    async getOne(@Param("id") id: number){
         return this.newsViewsService.getOne(id)
     }
 
@@ -32,12 +30,12 @@ export class NewsViewsAdminController{
     }
 
     @Patch("update/:id")
-    async update(@Param("id") id: string, @Body() payload: NewsViewsUpdateAdminDto){
+    async update(@Param("id") id: number, @Body() payload: NewsViewsUpdateAdminDto){
         return this.newsViewsService.update(id, payload)
     }
 
     @Delete("delete/:id")
-    async delete(@Param("id") id: string){
+    async delete(@Param("id") id: number){
         return this.newsViewsService.delete(id)
     }
 

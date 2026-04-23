@@ -35,23 +35,33 @@ import { CourseUserLessonsPublicService } from './services/course-user-lessons/c
 import { PurchasedCoursesAdminService } from './services/purchased-courses/purchased-courses.admin.service';
 import { PurchasedCoursesPublicService } from './services/purchased-courses/purchased-courses.public.service';
 import { CourseSectionsPublicController } from './controllers/course-sections/course-sections.public.controller';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { jwtConfig } from '../../config/jwt.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CourseCategories } from './entities/course-categories.entity';
 import { Course } from './entities/course.entity';
+import { CourseRepository } from './repositories/course.repository';
+import { CourseCategories } from './entities/course-categories.entity';
+import { CourseLessons } from './entities/course-lessons.entity';
+import { CourseLikes } from './entities/course-likes.entity';
+import { CourseReviews } from './entities/course-reviews.entity';
+import { CourseSections } from './entities/course-sections.entity';
+import { CourseUserLessons } from './entities/course-user-lessons.entity';
+import { PurchasedCourses } from './entities/purchased-courses.entity';
+import { CourseCategoriesRepository } from './repositories/course-categories.repository';
+import { CourseLessonsRepository } from './repositories/course-lessons.repository';
+import { CourseLikesRepository } from './repositories/course-likes.repository';
+import { CourseReviewsRepository } from './repositories/course-reviews.repository';
+import { CourseSectionsRepository } from './repositories/course-sections.repository';
+import { CourseUserLessonsRepository } from './repositories/course-user-lessons.repository';
+import { PurchasedCoursesRepository } from './repositories/purchased-courses.repository';
 
 @Module({
+
   imports: [
-    TypeOrmModule.forFeature([CourseCategories, Course]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: jwtConfig,
-    }
-      ),
+    TypeOrmModule.forFeature([Course, CourseCategories,
+      CourseLessons, CourseLikes,
+      CourseReviews, CourseSections,
+      CourseUserLessons, PurchasedCourses]),
   ],
+
   controllers: [CourseAdminController, CoursePublicController,
     CourseCategoriesAdminController, CourseCategoriesPublicController,
     CourseLessonsAdminController, CourseLessonsPublicController,
@@ -68,7 +78,11 @@ import { Course } from './entities/course.entity';
     CourseReviewsAdminService, CourseReviewsPublicService,
     CourseSectionsAdminService, CourseSectionsPublicService,
     CourseUserLessonsAdminService, CourseUserLessonsPublicService,
-    PurchasedCoursesAdminService, PurchasedCoursesPublicService],
+    PurchasedCoursesAdminService, PurchasedCoursesPublicService,
+  CourseRepository, CourseCategoriesRepository,
+  CourseLessonsRepository, CourseLikesRepository,
+  CourseReviewsRepository, CourseSectionsRepository,
+  CourseUserLessonsRepository, PurchasedCoursesRepository],
 
 })
 

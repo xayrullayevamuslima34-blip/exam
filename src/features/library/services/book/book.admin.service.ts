@@ -1,59 +1,57 @@
-import {Body, Injectable, NotFoundException, Param, UploadedFile} from "@nestjs/common";
-import {Book} from "../../entities/book.entity";
-import {BookCreateAdminDto} from "../../dtos/book/admin/book.create.admin.dto";
-import {BookUpdateAdminDto} from "../../dtos/book/admin/book.update.admin.dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Book } from '../../entities/book.entity';
+import { BookCreateAdminDto } from '../../dtos/book/admin/book.create.admin.dto';
+import { BookUpdateAdminDto } from '../../dtos/book/admin/book.update.admin.dto';
 import { ConfigService } from '@nestjs/config';
+import { BookFilter } from '../../filters/book.filter';
+import { BookRepository } from '../../repositories/book.repository';
 
 @Injectable()
-export class BookAdminService{
+export class BookAdminService {
 
-    constructor(private readonly config: ConfigService) {}
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: BookRepository) {
+  }
 
-    async getAll(){
-        const rawBook = await Book.find();
-        for await (const book of rawBook){
-            book.image = this.config.getOrThrow<string>('BASE_URL')
-        }
-        return await Book.find()
+  async getAll(filters: BookFilter) {
+    return await this.repo.getAll(filters);
+  }
+
+  async getOne(id: number) {
+    const book = await this.repo.getOneById(id);
+
+    if (!book) {
+      throw new NotFoundException('Book not found');
+    }
+    return book;
+  }
+
+  async create(payload: BookCreateAdminDto, image: Express.Multer.File) {
+    const newBook = Book.create({ ...payload, image: image.path });
+    return await this.repo.save(newBook);
+  }
+
+  async update(id: number, payload: BookUpdateAdminDto, image: Express.Multer.File) {
+    const book = await this.repo.getOneById(id);
+    if (!book) {
+      throw new NotFoundException('Book not found');
     }
 
-    async getOne(@Param("id") id: string){
-        const book = await Book.findOneBy({id: +id})
+    Object.assign(book,
+      Object.fromEntries(
+        Object.entries(payload).filter(([key, value]) => value),
+      ));
+    return await this.repo.save(book);
+  }
 
-        if(!book){
-            throw new NotFoundException("Book not found")
-        }
-        return book
+  async delete(id: number) {
+    const book = await this.repo.getOneById(id);
+    if (!book) {
+      throw new NotFoundException('Book not found');
     }
-
-    async create(payload: BookCreateAdminDto, image: Express.Multer.File){
-        const newBook = Book.create({...payload, image: image.path})
-        await Book.save(newBook)
-        return newBook
-    }
-
-    async update(id: string, payload: BookUpdateAdminDto, image: Express.Multer.File){
-        const book = await Book.findOneBy({id: +id})
-        if(!book){
-            throw new NotFoundException("Book not found")
-        }
-
-        Object.assign(book,
-            Object.fromEntries(
-                Object.entries(payload).filter(([key, value]) => value)
-            ))
-        await Book.save(book)
-        return book
-    }
-
-    async delete(@Param("id") id: string){
-        const book = await Book.findOneBy({id: +id})
-        if(!book){
-            throw new NotFoundException("Book not found")
-        }
-        await Book.remove(book)
-        return {message: "Deleted Successfully"}
-    }
+    await this.repo.delete(book);
+    return { message: 'Deleted Successfully' };
+  }
 
 
 }

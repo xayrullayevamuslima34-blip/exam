@@ -1,14 +1,19 @@
-import {Body, Injectable} from "@nestjs/common";
-import {CourseReviews} from "../../entities/course-reviews.entity";
-import {CourseReviewCreateAdminDto} from "../../dtos/course-reviews/admin/course-review.create.admin.dto";
+import { Injectable } from '@nestjs/common';
+import { CourseReviews } from '../../entities/course-reviews.entity';
+import { CourseReviewCreateAdminDto } from '../../dtos/course-reviews/admin/course-review.create.admin.dto';
+import { CourseReviewsRepository } from '../../repositories/course-reviews.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class CourseReviewsPublicService{
+export class CourseReviewsPublicService {
 
-    async create(@Body() payload: CourseReviewCreateAdminDto){
-        const review = CourseReviews.create(payload as CourseReviews)
-        await CourseReviews.save(review)
-        return review
-    }
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: CourseReviewsRepository) {
+  }
+
+  async create(payload: CourseReviewCreateAdminDto) {
+    const review = CourseReviews.create(payload as CourseReviews);
+    return await this.repo.save(review);
+  }
 
 }

@@ -1,14 +1,21 @@
-import {Injectable, NotFoundException, Param} from "@nestjs/common";
-import {BookCategory} from "../../entities/book-category.entity";
+import {Injectable, NotFoundException} from "@nestjs/common";
+import { BookCategoryFilter } from '../../filters/book-category.filter';
+import { BookCategoryRepository } from '../../repositories/book-category.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BookCategoryPublicService{
-    async getAll(){
-        return await BookCategory.find()
+
+    constructor(protected readonly config: ConfigService,
+                protected readonly repo: BookCategoryRepository) {
     }
 
-    async getOne(@Param("id") id: string){
-        const category = await BookCategory.findOneBy({id: +id})
+    async getAll(filter: BookCategoryFilter){
+        return await this.repo.getAll(filter)
+    }
+
+    async getOne(id: number){
+        const category = await this.repo.getOneById(id)
         if(!category){
             throw new NotFoundException("Book not found")
         }

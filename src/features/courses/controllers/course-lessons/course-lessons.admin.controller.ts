@@ -3,14 +3,12 @@ import {
     Controller,
     Delete,
     Get,
-    NotFoundException,
     Param,
     Patch,
-    Post, UploadedFile,
+    Post, Query, UploadedFile,
     UseGuards,
     UseInterceptors
 } from "@nestjs/common";
-import {CourseLessons} from "../../entities/course-lessons.entity";
 import {CourseLessonCreateAdminDto} from "../../dtos/course-lessons/admin/course-lesson.create.admin.dto";
 import {CourseLessonUpdateAdminDto} from "../../dtos/course-lessons/admin/course-lesson.update.admin.dto";
 import {CourseLessonsAdminService} from "../../services/course-lessons/course-lessons.admin.service";
@@ -22,6 +20,7 @@ import {Role} from "../../../../core/enums/role.enum";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
 import { CourseLessonListAdminDto } from '../../dtos/course-lessons/admin/course-lesson.list.admin.dto';
+import { CourseLessonsFilter } from '../../filters/course-lessons.filter';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -33,13 +32,13 @@ export class CourseLessonsAdminController{
 
     @ApiOkResponse({type: [CourseLessonListAdminDto], isArray: true})
     @Get("list")
-    async getAll(){
-        return this.courseLessonsService.getAll()
+    async getAll(@Query() filter: CourseLessonsFilter){
+        return this.courseLessonsService.getAll(filter)
     }
 
     @ApiOkResponse({type: [CourseLessonListAdminDto]})
     @Get(":id")
-    async getOne(@Param("id") id: string){
+    async getOne(@Param("id") id: number){
         return this.courseLessonsService.getOne(id)
     }
 
@@ -51,12 +50,12 @@ export class CourseLessonsAdminController{
 
     @UseInterceptors(FileInterceptor('icon', {storage: storageOptions}))
     @Patch("update/:id")
-    async update(@Param("id") id: string, @Body() payload: CourseLessonUpdateAdminDto, @UploadedFile() video: Express.Multer.File){
+    async update(@Param("id") id: number, @Body() payload: CourseLessonUpdateAdminDto, @UploadedFile() video: Express.Multer.File){
         return this.courseLessonsService.update(id, payload, video)
     }
 
     @Delete("delete/:id")
-    async delete(@Param("id") id: string){
+    async delete(@Param("id") id: number){
         return this.courseLessonsService.delete(id)
     }
 

@@ -1,15 +1,23 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SouvenirLikes } from '../../entities/souvenirLikes.entity';
-import { Users } from '../../../common/users/entities/user.entity';
+import { Users } from '../../../common/entities/user.entity';
+import { SouvenirLikesFilter } from '../../filters/souvenirLikes.filter';
+import { SouvenirLikesRepository } from '../../repositories/souvenirLikes.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SouvenirLikesPublicService{
-  async getAll(){
-    return await SouvenirLikes.find()
+
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: SouvenirLikesRepository) {
+  }
+
+  async getAll(filter: SouvenirLikesFilter){
+    return await this.repo.getAll(filter)
   }
 
   async getOne(id:number){
-    const souvenirLike = await SouvenirLikes.findOneBy({id:id})
+    const souvenirLike = await this.repo.getOneById(id)
     if(!souvenirLike){
       throw new NotFoundException("Not Found")
     }
@@ -29,11 +37,11 @@ export class SouvenirLikesPublicService{
 
     const like = await SouvenirLikes.findOneBy({userId, souvenirId})
     if(like){
-      await SouvenirLikes.remove(like)
+      await this.repo.delete(like)
       return {message: "Souvenir like was removed"};
     }else {
       const newLike = SouvenirLikes.create({userId: user.id, souvenirId: souvenir.id})
-      await SouvenirLikes.save(newLike)
+      await this.repo.save(newLike)
       return {message: "Souvenir like was saved"};
     }
 

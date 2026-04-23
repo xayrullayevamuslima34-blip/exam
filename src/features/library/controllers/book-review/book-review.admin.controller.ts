@@ -1,15 +1,13 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Patch, Post, Query} from "@nestjs/common";
 import {BookReviewCreateAdminDto} from "../../dtos/book-review/admin /book-review.create.admin.dto";
 import {BookReviewUpdateAdminDto} from "../../dtos/book-review/admin /book-review.update.admin.dto";
 import {BookReviewAdminService} from "../../services/book-review/book-review.admin.service";
 import {ApiBearerAuth} from "@nestjs/swagger";
-import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
-import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
+import { BookReviewFilter } from '../../filters/book-review.filter';
 
 @ApiBearerAuth()
-@UseGuards(AuthenticationGuard, RolesGuard)
 @Roles(Role.Admin)
 @Controller("admin/book-review")
 export class BookReviewAdminController{
@@ -17,12 +15,12 @@ export class BookReviewAdminController{
     constructor(private readonly bookReviewService: BookReviewAdminService) {}
 
     @Get("list")
-    async getAll(){
-        return this.bookReviewService.getAll()
+    async getAll(@Query() filter: BookReviewFilter){
+        return this.bookReviewService.getAll(filter)
     }
 
     @Get(":id")
-    async getOne(@Param("id") id: string){
+    async getOne(@Param("id") id: number){
         return this.bookReviewService.getOne(id)
     }
 
@@ -32,12 +30,12 @@ export class BookReviewAdminController{
     }
 
     @Patch("update/:id")
-    async update(@Param("id") id: string, @Body() payload: BookReviewUpdateAdminDto){
+    async update(@Param("id") id: number, @Body() payload: BookReviewUpdateAdminDto){
         return this.bookReviewService.update(id, payload)
     }
 
     @Delete("delete/:id")
-    async delete(@Param("id") id: string){
+    async delete(@Param("id") id: number){
        return this.bookReviewService.delete(id)
     }
 

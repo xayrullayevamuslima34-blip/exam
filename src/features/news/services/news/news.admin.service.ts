@@ -5,17 +5,15 @@ import { NewsListAdminDto } from '../../dtos/news/admin/news.list.admin.dto';
 import { NewsUpdateAdminDto } from '../../dtos/news/admin/news.update.admin.dto';
 import { News } from '../../entities/news.entity';
 import { ConfigService } from '@nestjs/config';
-import { PaginationFilters } from '../../../../core/filters/pagination.filter';
-import { NewsAdminRepository } from '../../repositories/news/news.admin.repository';
-import { FindOptionsWhere, ILike } from 'typeorm';
 import { NewsFilter } from '../../filters/news.filter';
+import { NewsRepository } from '../../repositories/news.repository';
 
 
 @Injectable()
 export class NewsAdminService {
 
-  constructor(private readonly config: ConfigService,
-              private readonly repo: NewsAdminRepository) {
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: NewsRepository) {
   }
 
   async getAll(filters: NewsFilter) {
@@ -54,7 +52,7 @@ export class NewsAdminService {
     Object.assign(
       news,
       Object.fromEntries(
-        Object.entries(payload).filter(([_, value]) => value !== undefined && value !== null),
+        Object.entries(payload).filter(([_, value]) => value !== undefined),
       ));
     return await this.repo.save(news);
   }

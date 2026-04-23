@@ -6,7 +6,6 @@ import {
     Param,
     Delete,
     Patch,
-    UseGuards,
     UseInterceptors,
     UploadedFile, Query,
 } from '@nestjs/common';
@@ -15,25 +14,23 @@ import {NewsUpdateAdminDto} from "../../dtos/news/admin/news.update.admin.dto";
 import {ApiBearerAuth, ApiOkResponse} from "@nestjs/swagger";
 import {NewsListAdminDto} from "../../dtos/news/admin/news.list.admin.dto";
 import {NewsAdminService} from "../../services/news/news.admin.service";
-import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
-import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
 import { NewsFilter } from '../../filters/news.filter';
+import { PaginatedResult } from '../../../../core/paginatedResult.dto';
 
 @ApiBearerAuth()
-@UseGuards(AuthenticationGuard, RolesGuard)
 @Roles(Role.Admin)
 @Controller('admin/news')
 export class NewsAdminController {
 
-    constructor(private service: NewsAdminService) {
+    constructor(private readonly service: NewsAdminService) {
     }
 
     @Get()
-    @ApiOkResponse({type: NewsListAdminDto, isArray: true})
+    @ApiOkResponse({type: [PaginatedResult]})
     async getAll(@Query() filters: NewsFilter){
         return await this.service.getAll(filters)
     }

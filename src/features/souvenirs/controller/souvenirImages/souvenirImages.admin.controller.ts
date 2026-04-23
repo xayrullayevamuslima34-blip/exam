@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
-import { x } from 'joi';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { SouvenirImagesAdminService } from '../../services/souvenirImages/souvenirImages.admin.service';
 import { SouvenirImagesCreateAdminDto } from '../../dtos/souvenirImages/admin/souvenirImages.create.admin.dto';
 import { SouvenirImagesUpdateAdminDto } from '../../dtos/souvenirImages/admin/souvenirImages.update.public.dto';
+import { SouvenirImagesFilter } from '../../filters/souvenirImages.filter';
 
 @Controller("admin/souvenirImages")
 export class SouvenirImagesAdminController{
@@ -10,8 +10,8 @@ export class SouvenirImagesAdminController{
   constructor(private readonly souvenirImageService: SouvenirImagesAdminService) {}
 
   @Get("list")
-  async getAll(){
-    return this.souvenirImageService.getAll();
+  async getAll(@Query() filter: SouvenirImagesFilter){
+    return this.souvenirImageService.getAll(filter);
   }
 
   @Get(":id")

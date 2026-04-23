@@ -1,14 +1,20 @@
-import {Injectable, NotFoundException, Param} from "@nestjs/common";
-import {CourseLessons} from "../../entities/course-lessons.entity";
+import {Injectable, NotFoundException} from "@nestjs/common";
+import { CourseLessonsFilter } from '../../filters/course-lessons.filter';
+import { CourseLessonsRepository } from '../../repositories/course-lessons.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CourseLessonsPublicService{
-    async getAll(){
-        return await CourseLessons.find()
+
+    constructor(protected readonly config: ConfigService,
+                protected readonly repo: CourseLessonsRepository) {}
+
+    async getAll(filter: CourseLessonsFilter){
+        return await this.repo.getAll(filter)
     }
 
-    async getOne(@Param("id") id: string){
-        const lesson = await CourseLessons.findOneBy({id: +id})
+    async getOne(id: number){
+        const lesson = await this.repo.getOneById(id)
         if (!lesson){
             throw new NotFoundException("Course not found")
         }

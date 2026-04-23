@@ -1,0 +1,10 @@
+import { IsNumber, IsOptional } from 'class-validator';
+import { PaginationFilters } from '../../../core/filters/pagination.filter';
+import { ApiProperty } from '@nestjs/swagger';
+
+export class CourseLikesFilter extends PaginationFilters{
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty({required: false})
+  userId?: number;
+}

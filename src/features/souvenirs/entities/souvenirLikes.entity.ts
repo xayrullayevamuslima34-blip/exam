@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseModel } from '../../../core/base-module';
 import { Souvenirs } from './souvenirs.entity';
-import { Users } from '../../common/users/entities/user.entity';
+import { Users } from '../../common/entities/user.entity';
 
 @Entity('souvenirLikes')
 export class SouvenirLikes extends BaseModel{

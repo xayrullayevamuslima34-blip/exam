@@ -1,30 +1,29 @@
 import { Module } from '@nestjs/common';
-import { PlayerAdminController } from './players/controllers/player.admin.controller';
-import { PlayerPublicController } from './players/controllers/player.public.controller';
-import { PlayerAdminService } from './players/service/player.admin.service';
-import { PlayerPublicService } from './players/service/player.public.service';
-import { MatchAdminController } from './matches/controllers/match.admin.controller';
-import { MatchPublicController } from './matches/controllers/match.public.controller';
-import { MatchAdminService } from './matches/service/match.admin.service';
-import { MatchPublicService } from './matches/service/match.public.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { jwtConfig } from '../../config/jwt.config';
-import { JwtModule } from '@nestjs/jwt';
+import { PlayerAdminController } from './controllers/players/player.admin.controller';
+import { PlayerPublicController } from './controllers/players/player.public.controller';
+import { PlayerAdminService } from './services/players/player.admin.service';
+import { PlayerPublicService } from './services/players/player.public.service';
+import { MatchAdminController } from './controllers/matches/match.admin.controller';
+import { MatchPublicController } from './controllers/matches/match.public.controller';
+import { MatchAdminService } from './services/matches/match.admin.service';
+import { MatchPublicService } from './services/matches/match.public.service';
+import { Match } from './entities/match.entity';
+import { Player } from './entities/player.entity';
+import { MatchRepository } from './repositories/match.repository';
+import { PlayerRepository } from './repositories/player.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 
 @Module({
-  imports: [
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: jwtConfig,
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([Match, Player])],
+
   controllers: [PlayerAdminController, PlayerPublicController,
     MatchAdminController, MatchPublicController],
 
   providers: [PlayerAdminService, PlayerPublicService,
-    MatchAdminService, MatchPublicService],
+    MatchAdminService, MatchPublicService,
+    MatchRepository, PlayerRepository
+  ],
 })
 export class ChessModule {
 }

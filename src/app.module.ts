@@ -16,6 +16,9 @@ import { ReportModule } from './features/report/report.module';
 import { ChessModule } from './features/chess/chess.module';
 import { CartModule } from './features/cart/cart.module';
 import { SouvenirsModule } from './features/souvenirs/souvenir.module';
+import { AuthenticationGuard } from './core/guards/authentication.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './core/guards/role.guard';
 
 @Module({
   imports: [
@@ -39,11 +42,7 @@ import { SouvenirsModule } from './features/souvenirs/souvenir.module';
       }),
     }),
 
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: jwtConfig,
-    }),
+    JwtModule.register(jwtConfig),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -52,14 +51,18 @@ import { SouvenirsModule } from './features/souvenirs/souvenir.module';
     }),
 
     AuthorizationModule,
+    CartModule,
     ChessModule,
     CommonModule,
     CourseModule,
     LibraryModule,
     NewsModule,
     ReportModule,
-    CartModule,
     SouvenirsModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: AuthenticationGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
 export class AppModule {

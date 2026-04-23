@@ -6,23 +6,22 @@ import { RolesGuard } from '../../../../core/guards/role.guard';
 import { NewsFilter } from '../../filters/news.filter';
 import { Roles } from '../../../../core/decorators/roles.decorator';
 import { Role } from '../../../../core/enums/role.enum';
-import { PaginationResultNewsDto } from '../../filters/pagination-result.news.dto';
 import {ParseIntPipe, UseFilters} from '@nestjs/common';
 import { NewsListPublicDto } from '../../dtos/news/public/news.list.public.dto';
 import { GlobalFilter } from '../../../../core/filters/global.filter';
+import { PaginatedResult } from '../../../../core/paginatedResult.dto';
 
-@UseGuards(AuthenticationGuard, RolesGuard)
 @Roles(Role.User)
 @UseFilters(GlobalFilter)
 @Controller('public/news')
 export class NewsPublicController {
 
-    constructor(private service: NewsPublicService) {
+    constructor(private readonly service: NewsPublicService) {
     }
 
     @Get()
-    @ApiOkResponse({type: [PaginationResultNewsDto], isArray: true})
-    async getAll(@Req() req: Request, @Query() filter: NewsFilter){
+    @ApiOkResponse({type: [PaginatedResult], isArray: true})
+    async getAll( @Query() filter: NewsFilter){
         let news = await this.service.getAll(filter)
         return news
     }

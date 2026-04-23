@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards} from "@nestjs/common";
 import {BookCategoryCreateAdminDto} from "../../dtos/book-category/admin/book-category.create.admin.dto";
 import {BookCategoryUpdateAdminDto} from "../../dtos/book-category/admin/book-category.update.admin.dto";
 import {BookCategoryAdminService} from "../../services/book-category/book-category.admin.service";
@@ -7,6 +7,7 @@ import {AuthenticationGuard} from "../../../../core/guards/authentication.guard"
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
+import { BookCategoryFilter } from '../../filters/book-category.filter';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -17,12 +18,12 @@ export class BookCategoryAdminController{
     constructor(private readonly bookCategoryService: BookCategoryAdminService) {}
 
     @Get("list")
-    async getAll(){
-        return this.bookCategoryService.getAll()
+    async getAll(@Query() filter: BookCategoryFilter){
+        return this.bookCategoryService.getAll(filter)
     }
 
     @Get(":id")
-    async getOne(@Param("id") id: string){
+    async getOne(@Param("id") id: number){
         return this.bookCategoryService.getOne(id)
     }
 
@@ -32,12 +33,12 @@ export class BookCategoryAdminController{
     }
 
     @Patch("update/:id")
-    async update(@Param("id") id: string, @Body() payload: BookCategoryUpdateAdminDto){
+    async update(@Param("id") id: number, @Body() payload: BookCategoryUpdateAdminDto){
         return this.bookCategoryService.update(id, payload)
     }
 
     @Delete("delete/:id")
-    async delete(@Param("id") id: string){
+    async delete(@Param("id") id: number){
         return this.bookCategoryService.delete(id)
     }
 

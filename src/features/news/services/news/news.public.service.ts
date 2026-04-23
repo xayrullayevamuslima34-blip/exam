@@ -1,39 +1,33 @@
 import {plainToInstance} from "class-transformer";
-import {NotFoundException} from "@nestjs/common";
 import {News} from "../../entities/news.entity";
 import { NewsFilter } from '../../filters/news.filter';
-import { FindOptionsWhere, ILike } from 'typeorm';
-import { PaginationResultNewsDto } from '../../filters/pagination-result.news.dto';
-import { NewsListPublicDto } from '../../dtos/news/public/news.list.public.dto';
 import { ConfigService } from '@nestjs/config';
+import { NotFoundException } from '@nestjs/common';
+import { NewsRepository } from '../../repositories/news.repository';
+import { NewsListAdminDto } from '../../dtos/news/admin/news.list.admin.dto';
 
 export class NewsPublicService{
 
-    constructor(private readonly config: ConfigService) {}
+    constructor(protected readonly config: ConfigService,
+                protected readonly repo: NewsRepository) {}
 
-    async getAll(filter: NewsFilter){
-        let whereOptions: FindOptionsWhere<News> = {};
-        let take = filter.size ?? this.config.getOrThrow<number>('DEFAULT_SIZE')
-        const currentPage = filter.page ?? this.config.getOrThrow<number>('DEFAULT_PAGE')
-        const skip = (currentPage - 1 ) * take
+    async getAll(filters: NewsFilter){
+        const rawNews = await this.repo.getAll(filters);
 
-        if(filter.search){
-            whereOptions.title = ILike(`%${filter.search}%`)
-        }
+        const baseUrl = this.config.getOrThrow<string>('BASE_URL');
+        rawNews.data = rawNews.data.map(news => ({
+            ...news,
+            image: news.image ? `${baseUrl}/${news.image}` : null
+        }));
 
-        const totalCount = await News.countBy(whereOptions)
-        const totalPages = Math.ceil(totalCount / take)
-        const nextPage = currentPage < totalPages ? currentPage + 1 : 1;
-
-        const news = await News.find({where: whereOptions, take: take, skip: skip})
-        const data = plainToInstance(NewsListPublicDto, news, {excludeExtraneousValues: true})
-        return {totalCount, totalPages, currentPage, nextPage, data} as PaginationResultNewsDto
+        rawNews.data = plainToInstance(NewsListAdminDto, rawNews.data, { excludeExtraneousValues: true });
+        return rawNews;
     }
 
     async getOne(id: number){
         const news = await News.findOneBy({id: id})
         if (!news){
-            throw Error()
+            throw new NotFoundException("News with given id not found");
         }
         return news
     }

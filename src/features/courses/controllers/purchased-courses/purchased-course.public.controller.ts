@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards} from "@nestjs/common";
 import {PurchasedCoursesPublicService} from "../../services/purchased-courses/purchased-courses.public.service";
 import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
 import {RolesGuard} from "../../../../core/guards/role.guard";
@@ -7,6 +7,7 @@ import {PurchasedCourseUpdatePublicDto} from "../../dtos/purchased-courses/publi
 import {ApiBearerAuth} from "@nestjs/swagger";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
+import { PurchasedCoursesFilter } from '../../filters/purchased-courses.filter';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -17,12 +18,12 @@ export class PurchasedCoursePublicController{
     constructor(private readonly purchasedCourseService: PurchasedCoursesPublicService) {}
 
     @Get("list")
-    async getAll(){
-        return this.purchasedCourseService.getAll()
+    async getAll(@Query() filter: PurchasedCoursesFilter){
+        return this.purchasedCourseService.getAll(filter)
     }
 
     @Get(":id")
-    async getOne(@Param("id") id: string){
+    async getOne(@Param("id") id: number){
         return this.purchasedCourseService.getOne(id)
     }
 
@@ -32,12 +33,12 @@ export class PurchasedCoursePublicController{
     }
 
     @Patch("update/:id")
-    async update(@Param("id") id: string, @Body() payload: PurchasedCourseUpdatePublicDto){
+    async update(@Param("id") id:  number, @Body() payload: PurchasedCourseUpdatePublicDto){
         return this.purchasedCourseService.update(id, payload)
     }
 
     @Delete("delete/:id")
-    async delete(@Param("id") id: string){
+    async delete(@Param("id") id: number){
         return this.purchasedCourseService.delete(id)
     }
 

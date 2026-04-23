@@ -1,27 +1,33 @@
-import {Body, Injectable, NotFoundException, Param} from "@nestjs/common";
-import {BookLike} from "../../entities/book-like.entity";
-import {BookLikeCreateAdminDto} from "../../dtos/book-like/admin/book-like.create.admin.dto";
+import {Injectable, NotFoundException} from "@nestjs/common";
+import { BookLikeFilter } from '../../filters/book-like.filter';
+import { ConfigService } from '@nestjs/config';
+import { BookLikeRepository } from '../../repositories/book-like.repository';
 
 @Injectable()
 export class BookLikeAdminService{
-    async getAll(){
-        return await BookLike.find()
+
+    constructor(protected readonly config: ConfigService,
+                protected readonly repo: BookLikeRepository) {
     }
 
-    async getOne(@Param("id") id: string){
-        const like = await BookLike.findOneBy({id: +id})
+    async getAll(filter: BookLikeFilter){
+        return await this.repo.getAll(filter)
+    }
+
+    async getOne(id: number){
+        const like = await this.repo.getOneById(id)
         if(!like){
             throw new NotFoundException("Like not found")
         }
         return like
     }
 
-    async delete(@Param("id") id: string){
-        const like = await BookLike.findOneBy({id: +id})
+    async delete(id: number){
+        const like = await this.repo.getOneById(id)
         if(!like){
             throw new NotFoundException("Like not found")
         }
-        await BookLike.remove(like)
+        await this.repo.delete(like)
         return {message: "Deleted successfully"}
     }
 

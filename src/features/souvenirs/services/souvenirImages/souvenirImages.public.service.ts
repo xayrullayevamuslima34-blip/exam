@@ -1,14 +1,21 @@
-import { SouvenirImages } from '../../entities/souvenirImages.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { SouvenirImagesFilter } from '../../filters/souvenirImages.filter';
+import { SouvenirImagesRepository } from '../../repositories/souvenirImages.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SouvenirImagesPublicService{
-  async getAll(){
-    return await SouvenirImages.find()
+
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: SouvenirImagesRepository) {
+  }
+
+  async getAll(filter: SouvenirImagesFilter){
+    return await this.repo.getAll(filter)
   }
 
   async getOne(id:number){
-    const souvenirImage = await SouvenirImages.findOneBy({id:id})
+    const souvenirImage = await this.repo.getOneById(id)
     if(!souvenirImage){
       throw new NotFoundException('No such souvenir image')
     }

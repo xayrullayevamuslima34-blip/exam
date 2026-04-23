@@ -1,18 +1,25 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CartItems } from '../entities/cart.entity';
+import { CartFilter } from '../filters/cart.filter';
+import { ConfigService } from '@nestjs/config';
+import { CartItemsRepository} from '../repositories/cart.repository';
 
 @Injectable()
 export class CartItemsAdminService {
-  async getAll(){
-    return await CartItems.find()
+
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: CartItemsRepository) {
   }
 
-  async getOne(id: number){
-    const cart = CartItems.findOneBy({ id: id })
-    if (!cart){
-      throw new NotFoundException("Cart with the given id not found")
+  async getAll(filter: CartFilter) {
+    return await this.repo.getAll(filter);
+  }
+
+  async getOne(id: number) {
+    const cart = await this.repo.getOneById(id);
+    if (!cart) {
+      throw new NotFoundException('Cart with the given id not found');
     }
-    return cart
+    return cart;
   }
 
 }

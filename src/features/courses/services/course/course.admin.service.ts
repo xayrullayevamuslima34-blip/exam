@@ -1,17 +1,18 @@
-import {Body, Injectable, NotFoundException, Param} from "@nestjs/common";
+import {Injectable, NotFoundException} from "@nestjs/common";
 import {Course} from "../../entities/course.entity";
 import {CourseCreateAdminDto} from "../../dtos/courses/admin/course.create.admin.dto";
 import {CourseUpdateAdminDto} from "../../dtos/courses/admin/course.update.admin.dto";
-import {plainToInstance} from "class-transformer";
-import {CourseListAdminDto} from "../../dtos/courses/admin/course.list.admin.dto";
 import { ConfigService } from '@nestjs/config';
+import { CourseFilter } from '../../filters/course.filter';
+import { CourseRepository } from '../../repositories/course.repository';
 
 @Injectable()
 export class CourseAdminService{
 
-    constructor(private readonly config: ConfigService) {}
+    constructor(protected readonly config: ConfigService,
+                protected readonly repo: CourseRepository) {}
 
-    async getAll(userId?: number) {
+    async getAll(filters: CourseFilter, userId?: number) {
         const courses = await Course.createQueryBuilder("courses")
             .leftJoinAndSelect("courses.likes", "likes", "likes.userId = userId", [userId, userId])
             .leftJoinAndSelect("courses.author", "author")
@@ -20,8 +21,8 @@ export class CourseAdminService{
             .leftJoinAndSelect("courses.language", "language")
             .getMany()
 
-        const rawCourses = await Course.find()
-        for (let course of rawCourses){
+        const rawCourses = await this.repo.getAll(filters)
+        for (let course of rawCourses.data){
             course.image = this.config.getOrThrow<string>('BASE_URL')
         }
 
@@ -31,12 +32,10 @@ export class CourseAdminService{
                 course.isLiked = Boolean(course.likes?.length)
             }
         }
-            return plainToInstance(CourseListAdminDto, courses, {excludeExtraneousValues: true})
-
     }
 
-    async getOne(id: string){
-        const course = await Course.findOneBy({id: +id})
+    async getOne(id: number){
+        const course = await this.repo.getOneById(id)
         if(!course){
             throw new NotFoundException("Course not found")
         }
@@ -45,12 +44,11 @@ export class CourseAdminService{
 
     async create(payload: CourseCreateAdminDto, image: Express.Multer.File){
         const course = Course.create({...payload, image: image.path})
-        await Course.save(course)
-        return course
+        return await this.repo.save(course)
     }
 
-    async update(id: string, payload: CourseUpdateAdminDto, image: Express.Multer.File){
-        const course = await Course.findOneBy({id: +id})
+    async update(id: number, payload: CourseUpdateAdminDto, image: Express.Multer.File){
+        const course = await this.repo.getOneById(id)
         if(!course){
             throw new NotFoundException("Course not found")
         }
@@ -58,16 +56,15 @@ export class CourseAdminService{
             Object.fromEntries(
                 Object.entries(payload).filter(([key, value]) => value)
             ))
-        await Course.save(course)
-        return course
+        return await this.repo.save(course)
     }
 
-    async delete(id: string){
-        const course = await Course.findOneBy({id: +id})
+    async delete(id: number){
+        const course = await this.repo.getOneById(id)
         if(!course){
             throw new NotFoundException("Course not found")
         }
-        await Course.remove(course)
+        await this.repo.delete(course)
         return {message: "Deleted successfully"}
     }
 

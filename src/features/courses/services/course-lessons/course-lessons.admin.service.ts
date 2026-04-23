@@ -1,37 +1,43 @@
-import {Body, Injectable, NotFoundException, Param} from "@nestjs/common";
+import {Injectable, NotFoundException} from "@nestjs/common";
 import {CourseLessons} from "../../entities/course-lessons.entity";
 import {CourseLessonCreateAdminDto} from "../../dtos/course-lessons/admin/course-lesson.create.admin.dto";
 import {CourseLessonUpdateAdminDto} from "../../dtos/course-lessons/admin/course-lesson.update.admin.dto";
 import { ConfigService } from '@nestjs/config';
+import { CourseLessonsFilter } from '../../filters/course-lessons.filter';
+import { CourseLessonsRepository } from '../../repositories/course-lessons.repository';
 
 @Injectable()
 export class CourseLessonsAdminService{
 
-    constructor(private readonly config: ConfigService) {}
+    constructor(protected readonly config: ConfigService,
+                protected readonly repo: CourseLessonsRepository) {}
 
-    async getAll(){
-        const rawCourseLessons = await CourseLessons.find()
-        for (let courseLesson of rawCourseLessons){
-            courseLesson.video = this.config.getOrThrow<string>('BASE_URL')
+    async getAll(filter:  CourseLessonsFilter){
+        const rawCourseLessons = await this.repo.getAll(filter)
+        const baseUrl = this.config.getOrThrow<string>('BASE_URL');
+
+        for (const lesson of rawCourseLessons.data) {
+            lesson.video = `${baseUrl}/${lesson.video}`;
         }
-        return await CourseLessons.find()
+
+        return rawCourseLessons
     }
 
-    async getOne( id: string){
-        const lesson = await CourseLessons.findOneBy({id: +id})
+    async getOne( id: number){
+        const lesson = await this.repo.getOneById(id)
         if (!lesson){
             throw new NotFoundException("Lesson not found")
         }
+        return lesson
     }
 
     async create(payload: CourseLessonCreateAdminDto, video: Express.Multer.File){
         const lesson = CourseLessons.create({...payload, video: video.path})
-        await CourseLessons.save(lesson)
-        return lesson
+        return  await this.repo.save(lesson)
     }
 
-    async update(id: string, payload: CourseLessonUpdateAdminDto, video: Express.Multer.File){
-        const lesson = await CourseLessons.findOneBy({id: +id})
+    async update(id: number, payload: CourseLessonUpdateAdminDto, video: Express.Multer.File){
+        const lesson = await this.repo.getOneById(id)
         if (!lesson){
             throw new NotFoundException("Lesson not found")
         }
@@ -39,17 +45,15 @@ export class CourseLessonsAdminService{
             Object.fromEntries(
                 Object.entries(payload).filter(([key, value]) => value)
             ))
-        await CourseLessons.save(lesson)
-        return lesson
+        return  await this.repo.save(lesson)
     }
 
-    async delete(@Param("id") id: string){
-        const lesson = await CourseLessons.findOneBy({id: +id})
+    async delete(id: number){
+        const lesson = await this.repo.getOneById(id)
         if (!lesson){
             throw new NotFoundException("Lesson not found")
         }
-        await CourseLessons.remove(lesson)
-        return lesson
+        return await this.repo.delete(lesson)
     }
 
 

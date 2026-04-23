@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import {
   SouvenirColorsAdminService,
 } from '../../services/souvenirColors/souvenirColors.admin.service';
@@ -6,34 +6,37 @@ import { SouvenirColorsCreateAdminDto } from '../../dtos/souvenirColors/admin/so
 import {
   SouvenirColorsUpdateAdminDto,
 } from '../../dtos/souvenirColors/admin/souvenirColors.update.public.dto';
-@Controller("admin/souvenirColors")
+import { SouvenirColorsFilter } from '../../filters/souvenirColors.filter';
+
+@Controller('admin/souvenirColors')
 export class SouvenirColorsAdminController {
 
-  constructor(private readonly souvenirColorService: SouvenirColorsAdminService) {}
-
-  @Get("list")
-  async getAll(){
-    return await this.souvenirColorService.getAll()
+  constructor(private readonly souvenirColorService: SouvenirColorsAdminService) {
   }
 
-  @Get(":id")
-  async getOne(@Param("id", ParseIntPipe) id: number){
-    return await this.souvenirColorService.getOne(id)
+  @Get('list')
+  async getAll(@Query() filter: SouvenirColorsFilter) {
+    return await this.souvenirColorService.getAll(filter);
   }
 
-  @Post("create")
-  async create(@Body() payload: SouvenirColorsCreateAdminDto){
-    return await this.souvenirColorService.create(payload)
+  @Get(':id')
+  async getOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.souvenirColorService.getOne(id);
   }
 
-  @Patch(":id")
-  async update(@Param("id", ParseIntPipe) id: number, @Body() payload: SouvenirColorsUpdateAdminDto){
-    return this.souvenirColorService.update(id, payload)
+  @Post('create')
+  async create(@Body() payload: SouvenirColorsCreateAdminDto) {
+    return await this.souvenirColorService.create(payload);
   }
 
-  @Delete(":id")
-  async delete(@Param("id", ParseIntPipe) id: number){
-    return await this.souvenirColorService.delete(id)
+  @Patch(':id')
+  async update(@Param('id', ParseIntPipe) id: number, @Body() payload: SouvenirColorsUpdateAdminDto) {
+    return this.souvenirColorService.update(id, payload);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    return await this.souvenirColorService.delete(id);
   }
 
 }

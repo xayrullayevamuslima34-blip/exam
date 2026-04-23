@@ -1,17 +1,25 @@
-import {Injectable, NotFoundException, Param} from "@nestjs/common";
-import {CourseCategories} from "../../entities/course-categories.entity";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CourseCategoriesFilter } from '../../filters/course-categories.filter';
+import { CourseCategoriesRepository } from '../../repositories/course-categories.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class CourseCategoriesPublicService{
-    async getAll(){
-        return await CourseCategories.find()
-    }
+export class CourseCategoriesPublicService {
 
-    async getOne(@Param("id") id: string){
-        const category = await CourseCategories.findOneBy({id: +id})
-        if(!category){
-            throw new NotFoundException("Course category not found")
-        }
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: CourseCategoriesRepository) {
+  }
+
+  async getAll(filter: CourseCategoriesFilter) {
+    return await this.repo.getAll(filter);
+  }
+
+  async getOne(id: number) {
+    const category = await this.repo.getOneById(id);
+    if (!category) {
+      throw new NotFoundException('Course category not found');
     }
+    return category;
+  }
 
 }

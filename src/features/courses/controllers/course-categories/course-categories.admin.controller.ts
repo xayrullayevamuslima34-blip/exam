@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards} from "@nestjs/common";
 import {CourseCategoriesCreateAdminDto} from "../../dtos/course-categories/admin/course-categories.create.admin.dto";
 import {CourseCategoriesUpdateAdminDto} from "../../dtos/course-categories/admin/course-categories.update.admin.dto";
 import {CourseCategoriesAdminService} from "../../services/course-categories/course-categories.admin.service";
@@ -7,6 +7,7 @@ import {AuthenticationGuard} from "../../../../core/guards/authentication.guard"
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
+import { CourseCategoriesFilter } from '../../filters/course-categories.filter';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -17,12 +18,12 @@ export class CourseCategoriesAdminController{
     constructor(private readonly courseCategoriesService: CourseCategoriesAdminService) {}
 
     @Get("list")
-    async getAll(){
-        return this.courseCategoriesService.getAll()
+    async getAll(@Query() filter: CourseCategoriesFilter){
+        return await this.courseCategoriesService.getAll(filter)
     }
 
     @Get(":id")
-    async getOne(@Param("id") id: string){
+    async getOne(@Param("id") id: number){
         return this.courseCategoriesService.getOne(id)
     }
 
@@ -32,12 +33,12 @@ export class CourseCategoriesAdminController{
     }
 
     @Patch("update/:id")
-    async update(@Param("id") id: string, @Body() payload: CourseCategoriesUpdateAdminDto){
+    async update(@Param("id") id: number, @Body() payload: CourseCategoriesUpdateAdminDto){
         return this.courseCategoriesService.update(id, payload)
     }
 
     @Delete("delete/:id")
-    async delete(@Param("id") id: string){
+    async delete(@Param("id") id: number){
         return this.courseCategoriesService.delete(id)
     }
 

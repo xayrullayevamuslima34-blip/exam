@@ -11,8 +11,8 @@ export interface PaginatedResult {
   data: any[];
 }
 
-export function PaginatedResultDto<T>(Dto: NestType<T>) {
-  class PaginatedResultDtoClass implements PaginatedResult {
+export function PaginatedResult<T>(Dto: NestType<T>) {
+  class PaginatedResult implements PaginatedResult {
     @ApiProperty()
     @Expose()
     totalPages!: number;
@@ -39,5 +39,5 @@ export function PaginatedResultDto<T>(Dto: NestType<T>) {
     data!: T[];
   }
 
-  return PaginatedResultDtoClass;
+  return PaginatedResult;
 }

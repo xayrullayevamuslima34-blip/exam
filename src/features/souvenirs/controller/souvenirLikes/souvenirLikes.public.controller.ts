@@ -1,5 +1,6 @@
-import { Controller, Get, Param, ParseIntPipe, Post, Req } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Post, Query, Req } from '@nestjs/common';
 import { SouvenirLikesPublicService } from '../../services/souvenirLikes/souvenirLikes.public.service';
+import { SouvenirLikesFilter } from '../../filters/souvenirLikes.filter';
 
 @Controller("public/souvenirLikes")
 export class SouvenirLikesPublicController{
@@ -7,8 +8,8 @@ export class SouvenirLikesPublicController{
   constructor(private readonly souvenirLikeService: SouvenirLikesPublicService) {}
 
   @Get("list")
-  async getAll(){
-    return await this.souvenirLikeService.getAll();
+  async getAll(@Query() filter: SouvenirLikesFilter){
+    return await this.souvenirLikeService.getAll(filter);
   }
 
   @Get(":id")

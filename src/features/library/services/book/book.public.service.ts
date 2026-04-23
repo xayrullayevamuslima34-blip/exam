@@ -1,21 +1,21 @@
-import {Injectable, NotFoundException, Param} from "@nestjs/common";
-import {Book} from "../../entities/book.entity";
+import {Injectable, NotFoundException} from "@nestjs/common";
 import { BookFilter } from '../../filters/book.filter';
-import { FindOptionsWhere } from 'typeorm';
+import { BookRepository } from '../../repositories/book.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BookPublicService{
-    async getAll(filter: BookFilter){
-        let whereOptions: FindOptionsWhere<Book> = {}
-        const take = filter.size ?? Number(process.env.DEFAULT_SIZE)
-        const skip = ((filter.page ?? Number(process.env.DEFAULT_PAGE)) - 1) * take
 
-        const book = await Book.find({where: whereOptions, skip: skip, take: take})
-        return book
+    constructor(protected readonly config: ConfigService,
+                protected readonly repo: BookRepository) {}
+
+
+    async getAll(filter: BookFilter){
+        return await this.repo.getAll(filter);
     }
 
-    async getOne(@Param("id")id: string){
-        const book = await Book.findOneBy({id: +id})
+    async getOne(id: number){
+        const book = await this.repo.getOneById(id)
 
         if(!book){
             throw new NotFoundException("Book not found")

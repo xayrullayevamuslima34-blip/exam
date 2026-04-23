@@ -1,7 +1,7 @@
 import {BaseModel} from "../../../core/base-module";
 import {Column, Entity, JoinColumn, ManyToOne} from "typeorm";
 import {CourseLessons} from "./course-lessons.entity";
-import {Users} from "../../common/users/entities/user.entity";
+import {Users} from "../../common/entities/user.entity";
 
 @Entity("course-user-lessons")
 export class CourseUserLessons extends BaseModel{

@@ -1,44 +1,52 @@
 import { Module } from '@nestjs/common';
-import { LanguageAdminController } from './languages/controllers/language.admin.controller';
-import { LanguagePublicController } from './languages/controllers/language.public.controller';
-import { UsersAdminController } from './users/controllers/user.admin.controller';
-import { UsersPublicController } from './users/controllers/user.public.controller';
-import { LanguageAdminService } from './languages/services/language.admin.service';
-import { LanguagePublicService } from './languages/services/language.public.service';
-import { UsersAdminService } from './users/services/user.admin.service';
-import { UsersPublicService } from './users/services/user.public.service';
-import { DifficultyAdminService } from './difficulties/services/difficult.admin.service';
-import { DifficultyPublicService } from './difficulties/services/difficult.public.service';
-import { DifficultyAdminController } from './difficulties/controllers/difficult.admin.controller';
-import { DifficultyPublicController } from './difficulties/controllers/difficult.public.controller';
-import { CountriesAdminController } from './countries/controllers/countries.admin.controller';
-import { CountriesAdminService } from './countries/services/countries.admin.service';
-import { CountriesPublicService } from './countries/services/countries.public.service';
-import { CountriesPublicController } from './countries/controllers/countries.public.controller';
-import { TermsAdminController } from './terms/controllers/terms.admin.controller';
-import { TermsPublicController } from './terms/controllers/terms.public.controller';
-import { TermsAdminService } from './terms/services/terms.admin.service';
-import { TermsPublicService } from './terms/services/terms.public.service';
-import { AuthorsAdminController } from './author/controllers/author.admin.controller';
-import { AuthorsPublicController } from './author/controllers/author.public.controller';
-import { AuthorsAdminService } from './author/services/author.admin.service';
-import { AuthorsPublicService } from './author/services/author.public.service';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { jwtConfig } from '../../config/jwt.config';
-import { ColorAdminController } from './colors/controllers/color.admin.controller';
-import { ColorPublicController } from './colors/controllers/color.public.controller';
-import { ColorAdminService } from './colors/services/color.admin.servic';
-import { ColorPublicService } from './colors/services/color.public.servic';
+import { LanguageAdminController } from './controllers/languages/language.admin.controller';
+import { LanguagePublicController } from './controllers/languages/language.public.controller';
+import { UsersAdminController } from './controllers/users/user.admin.controller';
+import { UsersPublicController } from './controllers/users/user.public.controller';
+import { LanguageAdminService } from './services/languages/language.admin.service';
+import { LanguagePublicService } from './services/languages/language.public.service';
+import { UsersAdminService } from './services/users/user.admin.service';
+import { UsersPublicService } from './services/users/user.public.service';
+import { DifficultyAdminService } from './services/difficulties/difficult.admin.service';
+import { DifficultyPublicService } from './services/difficulties/difficult.public.service';
+import { DifficultyAdminController } from './controllers/difficulties/difficult.admin.controller';
+import { DifficultyPublicController } from './controllers/difficulties/difficult.public.controller';
+import { CountriesAdminController } from './controllers/countries/countries.admin.controller';
+import { CountriesAdminService } from './services/countries/countries.admin.service';
+import { CountriesPublicService } from './services/countries/countries.public.service';
+import { CountriesPublicController } from './controllers/countries/countries.public.controller';
+import { TermsAdminController } from './controllers/terms/terms.admin.controller';
+import { TermsPublicController } from './controllers/terms/terms.public.controller';
+import { TermsAdminService } from './services/terms/terms.admin.service';
+import { TermsPublicService } from './services/terms/terms.public.service';
+import { AuthorsAdminController } from './controllers/author/author.admin.controller';
+import { AuthorsPublicController } from './controllers/author/author.public.controller';
+import { AuthorsAdminService } from './services/author/author.admin.service';
+import { AuthorsPublicService } from './services/author/author.public.service';
+import { ColorAdminController } from './controllers/colors/color.admin.controller';
+import { ColorPublicController } from './controllers/colors/color.public.controller';
+import { ColorAdminService } from './services/colors/color.admin.servic';
+import { ColorPublicService } from './services/colors/color.public.servic';
+import { Author } from './entities/author.entity';
+import { Color } from './entities/color.entity';
+import { Countries } from './entities/countries.entity';
+import { Difficulty } from './entities/difficulty.entity';
+import { Language } from './entities/language.entity';
+import { Terms } from './entities/terms.entity';
+import { Users } from './entities/user.entity';
+import { AuthorRepository } from './repositories/author.repository';
+import { ColorRepository } from './repositories/color.repository';
+import { CountriesRepository } from './repositories/countries.repository';
+import { DifficultyRepository } from './repositories/difficulty.repository';
+import { LanguageRepository } from './repositories/language.repository';
+import { TermsRepository } from './repositories/terms.repository';
+import { UserRepository } from './repositories/user.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: jwtConfig,
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([Author, Color,
+    Countries, Difficulty,
+    Language, Terms, Users])],
 
   controllers: [AuthorsAdminController, AuthorsPublicController,
     CountriesAdminController, CountriesPublicController,
@@ -57,6 +65,10 @@ import { ColorPublicService } from './colors/services/color.public.servic';
     TermsAdminService, TermsPublicService,
     UsersAdminService, UsersPublicService,
     ColorAdminService, ColorPublicService,
+    AuthorRepository, ColorRepository,
+    CountriesRepository, DifficultyRepository,
+    LanguageRepository, TermsRepository,
+    UserRepository
   ],
 })
 

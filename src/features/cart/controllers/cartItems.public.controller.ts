@@ -1,7 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { CartItemsPublicService } from '../services/cartItems.public.service';
 import { CartItemCreatePublicDto } from '../dtos/cart/public/cart-item.create.public.dto';
 import { CartItemUpdatePublicDto } from '../dtos/cart/public/cart-item.update.public.dto';
+import { CartFilter } from '../filters/cart.filter';
+import { PaginatedResult } from '../../../core/paginatedResult.dto';
+import { ApiOkResponse } from '@nestjs/swagger';
 
 @Controller("public/cartItems")
 export class CartItemsPublicController{
@@ -9,9 +12,10 @@ export class CartItemsPublicController{
   constructor(private readonly cartService: CartItemsPublicService) {
   }
 
+  @ApiOkResponse({type: [PaginatedResult]})
   @Get()
-  async getAll() {
-    return this.cartService.getAll();
+  async getAll(@Query() filter: CartFilter) {
+    return this.cartService.getAll(filter);
   }
 
   @Get('id')

@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards} from "@nestjs/common";
 import {CourseUserLessonCreateAdminDto} from "../../dtos/course-user-lessons/admin/course-user-lesson.create.admin.dto";
 import {CourseUserLessonUpdateAdminDto} from "../../dtos/course-user-lessons/admin/course-user-lesson.update.admin.dto";
 import {CourseUserLessonsAdminService} from "../../services/course-user-lessons/course-user-lessons.admin.service";
@@ -7,6 +7,7 @@ import {AuthenticationGuard} from "../../../../core/guards/authentication.guard"
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
+import { CourseUserLessonsFilter } from '../../filters/course-user-lessons.filter';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -17,12 +18,12 @@ export class CourseUserLessonsAdminController{
     constructor(private readonly courseUserLessonService: CourseUserLessonsAdminService) {}
 
     @Get("list")
-    async getAll(){
-        return this.courseUserLessonService.getAll()
+    async getAll(@Query() filter: CourseUserLessonsFilter){
+        return this.courseUserLessonService.getAll(filter)
     }
 
     @Get(":id")
-    async getOne(@Param("id") id: string){
+    async getOne(@Param("id") id: number){
        return this.courseUserLessonService.getOne(id)
     }
 
@@ -32,12 +33,12 @@ export class CourseUserLessonsAdminController{
     }
 
     @Patch("update/id")
-    async update(@Param("id") id: string, @Body() payload: CourseUserLessonUpdateAdminDto){
+    async update(@Param("id") id: number, @Body() payload: CourseUserLessonUpdateAdminDto){
         return this.courseUserLessonService.update(id, payload)
     }
 
     @Delete("delete/:id")
-    async delete(@Param("id") id: string){
+    async delete(@Param("id") id: number){
         return this.courseUserLessonService.delete(id)
     }
 

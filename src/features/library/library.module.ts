@@ -15,21 +15,19 @@ import { BookLikeAdminService } from './services/book-like/book-like.admin.servi
 import { BookLikePublicService } from './services/book-like/book-like.public.service';
 import { BookReviewAdminService } from './services/book-review/book-review.admin.service';
 import { BookReviewPublicService } from './services/book-review/book-review.public.service';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { jwtConfig } from '../../config/jwt.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Book } from './entities/book.entity';
+import { BookCategory } from './entities/book-category.entity';
+import { BookLike } from './entities/book-like.entity';
+import { BookReview } from './entities/book-review.entity';
+import { BookRepository } from './repositories/book.repository';
+import { BookCategoryRepository } from './repositories/book-category.repository';
+import { BookLikeRepository } from './repositories/book-like.repository';
+import { BookReviewRepository } from './repositories/book-review.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Book]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: jwtConfig,
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([Book, BookCategory, BookLike, BookReview])],
+
   controllers: [BookAdminController, BookPublicController,
     BookCategoryAdminController, BookCategoryPublicController,
     BookLikeAdminController, BookLikePublicController,
@@ -38,7 +36,10 @@ import { Book } from './entities/book.entity';
   providers: [BookAdminService, BookPublicService,
     BookCategoryAdminService, BookCategoryPublicService,
     BookLikeAdminService, BookLikePublicService,
-    BookReviewAdminService, BookReviewPublicService],
+    BookReviewAdminService, BookReviewPublicService,
+    BookRepository, BookCategoryRepository,
+    BookLikeRepository, BookReviewRepository,
+  ],
 })
 export class LibraryModule {
 }

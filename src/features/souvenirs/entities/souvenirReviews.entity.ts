@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseModel } from '../../../core/base-module';
-import { Users } from '../../common/users/entities/user.entity';
+import { Users } from '../../common/entities/user.entity';
 import { Souvenirs } from './souvenirs.entity';
 
 @Entity('souvenirReviews')

@@ -1,14 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { SouvenirReviews } from '../../entities/souvenirReviews.entity';
+import { SouvenirReviewsFilter } from '../../filters/souvenirReviews.filter';
+import { ConfigService } from '@nestjs/config';
+import { SouvenirReviewsRepository } from '../../repositories/souvenirReviews.repository';
 
 @Injectable()
 export class SouvenirReviewsAdminService{
-  async getAll(){
-    return await SouvenirReviews.find()
+
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: SouvenirReviewsRepository) {
+  }
+
+  async getAll(filter: SouvenirReviewsFilter){
+    return await this.repo.getAll(filter)
   }
 
   async getOne(id:number){
-    const souvenirReview = await SouvenirReviews.findOneBy({id:id})
+    const souvenirReview = await this.repo.getOneById(id)
     if(!souvenirReview){
       throw new NotFoundException('No souvenir review found')
     }
@@ -16,11 +23,11 @@ export class SouvenirReviewsAdminService{
   }
 
   async delete(id:number){
-    const souvenirReview = await SouvenirReviews.findOneBy({id:id})
+    const souvenirReview = await this.repo.getOneById(id)
     if(!souvenirReview){
       throw new NotFoundException('No souvenir review found')
     }
-    await SouvenirReviews.remove(souvenirReview)
+    await this.repo.delete(souvenirReview)
     return {message: "Deleted souvenir review"}
   }
 

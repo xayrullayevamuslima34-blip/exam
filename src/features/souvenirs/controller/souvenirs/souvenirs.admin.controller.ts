@@ -1,7 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { SouvenirAdminService } from '../../services/souvenirs/souvenir.admin.service';
 import { SouvenirsCreateAdminDto } from '../../dtos/souvenirs/admin/souvenirs.create.admin.dto';
 import { SouvenirsUpdateAdminDto } from '../../dtos/souvenirs/admin/souvenirs.update.public.dto';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { PaginatedResult } from '../../../../core/paginatedResult.dto';
+import { SouvenirsFilter } from '../../filters/souvenirs.filter';
 
 @Controller("admin/souvenirs")
 export class SouvenirsAdminController {
@@ -9,8 +12,9 @@ export class SouvenirsAdminController {
   constructor(private readonly souvenirService: SouvenirAdminService) {}
 
   @Get("list")
-  async getAll(){
-    return await this.souvenirService.getAll();
+  @ApiOkResponse({type: PaginatedResult})
+  async getAll(@Query()filter: SouvenirsFilter){
+    return await this.souvenirService.getAll(filter);
   }
 
   @Get(":id")

@@ -1,8 +1,8 @@
 import {BaseModel} from "../../../core/base-module";
 import {Column, Entity, JoinColumn, ManyToOne} from "typeorm";
 import {Course} from "./course.entity";
-import {User} from "../../authorization/auth/entities/authentication.entity";
-import {Users} from "../../common/users/entities/user.entity";
+import {User} from "../../authorization/entities/authentication.entity";
+import {Users} from "../../common/entities/user.entity";
 
 @Entity("course-reviews")
 export class CourseReviews extends BaseModel{

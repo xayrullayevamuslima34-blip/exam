@@ -1,11 +1,13 @@
 import type {Request} from "express";
-import { Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import {CourseLikesPublicService} from "../../services/course-likes/course-likes.public.service";
 import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
 import {ApiBearerAuth} from "@nestjs/swagger";
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
+import { CourseCategoriesFilter } from '../../filters/course-categories.filter';
+import { CourseLikesFilter } from '../../filters/course-likes.filter';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -16,8 +18,8 @@ export class CourseLikesPublicController{
     constructor(private readonly courseLikeService: CourseLikesPublicService) {}
 
     @Get("list")
-    async getAll(){
-        return this.courseLikeService.getAll();
+    async getAll(@Query() filter: CourseLikesFilter){
+        return this.courseLikeService.getAll(filter);
     }
 
     @Get(":id")

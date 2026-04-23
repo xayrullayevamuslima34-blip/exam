@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { CartItemsAdminService } from '../cart/services/cartItems.admin.service';
-import { CartItemsPublicService } from '../cart/services/cartItems.public.service';
 import { SouvenirColorsAdminController } from './controller/souvenirColors/souvenirColors.admin.controller';
 import { SouvenirColorsPublicController } from './controller/souvenirColors/souvenirColors.public.controller';
 import { SouvenirImagesAdminController } from './controller/souvenirImages/souvenirImages.admin.controller';
@@ -21,19 +19,36 @@ import { SouvenirReviewsAdminService } from './services/ souvenirReviews/souveni
 import { SouvenirReviewsPublicService } from './services/ souvenirReviews/souvenirReviews.public.service';
 import { SouvenirAdminService } from './services/souvenirs/souvenir.admin.service';
 import { SouvenirPublicService } from './services/souvenirs/souvenir.public.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Souvenirs } from './entities/souvenirs.entity';
+import { SouvenirReviews } from './entities/souvenirReviews.entity';
+import { SouvenirLikes } from './entities/souvenirLikes.entity';
+import { SouvenirImages } from './entities/souvenirImages.entity';
+import { SouvenirColors } from './entities/souvenirColors.entity';
+import { SouvenirsRepository } from './repositories/souvenirs.repository';
+import { SouvenirReviewsRepository } from './repositories/souvenirReviews.repository';
+import { SouvenirLikesRepository } from './repositories/souvenirLikes.repository';
+import { SouvenirImagesRepository } from './repositories/souvenirImages.repository';
+import { SouvenirColorsRepository } from './repositories/souvenirColors.repository';
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forFeature([Souvenirs, SouvenirReviews, SouvenirLikes, SouvenirImages, SouvenirColors])],
+
   controllers: [SouvenirColorsAdminController, SouvenirColorsPublicController,
     SouvenirImagesAdminController, SouvenirImagesPublicController,
     SouvenirLikesAdminController, SouvenirLikesPublicController,
     SouvenirReviewsAdminController, SouvenirReviewsPublicController,
     SouvenirsAdminController, SouvenirsPublicController],
+
   providers: [SouvenirColorsAdminService, SouvenirColorsPublicService,
     SouvenirImagesAdminService, SouvenirImagesPublicService,
     SouvenirLikesAdminService, SouvenirLikesPublicService,
     SouvenirReviewsAdminService, SouvenirReviewsPublicService,
-    SouvenirAdminService, SouvenirPublicService],
+    SouvenirAdminService, SouvenirPublicService,
+    SouvenirsRepository, SouvenirReviewsRepository,
+    SouvenirLikesRepository, SouvenirImagesRepository,
+    SouvenirColorsRepository,
+  ],
 })
 export class SouvenirsModule {
 }

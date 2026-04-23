@@ -1,14 +1,14 @@
 import {BaseModel} from "../../../core/base-module";
 import {Column, Entity, JoinColumn, ManyToOne, OneToMany} from "typeorm";
 import {CourseCategories} from "./course-categories.entity";
-import {Language} from "../../common/languages/entities/language.entity";
+import {Language} from "../../common/entities/language.entity";
 import {CourseLessons} from "./course-lessons.entity";
 import {CourseLikes} from "./course-likes.entity";
 import {CourseReviews} from "./course-reviews.entity";
 import {CourseSections} from "./course-sections.entity";
 import {PurchasedCourses} from "./purchased-courses.entity";
-import {Difficulty} from "../../common/difficulties/entities/difficulty.entity";
-import {Author} from "../../common/author/entities/author.entity";
+import {Difficulty} from "../../common/entities/difficulty.entity";
+import {Author} from "../../common/entities/author.entity";
 
 @Entity("courses")
 export class Course extends BaseModel{

@@ -1,14 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SouvenirLikes } from '../../entities/souvenirLikes.entity';
+import { SouvenirLikesFilter } from '../../filters/souvenirLikes.filter';
+import { ConfigService } from '@nestjs/config';
+import { SouvenirLikesRepository } from '../../repositories/souvenirLikes.repository';
 
 @Injectable()
 export class SouvenirLikesAdminService{
-  async getAll(){
-    return await SouvenirLikes.find()
+
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: SouvenirLikesRepository) {
+  }
+
+  async getAll(filter: SouvenirLikesFilter){
+    return await this.repo.getAll(filter)
   }
 
   async getOne(id:number){
-    const souvenirLike = await SouvenirLikes.findOneBy({id:id})
+    const souvenirLike = await this.repo.getOneById(id)
     if(!souvenirLike){
       throw new NotFoundException('No such souvenir image')
     }
@@ -16,11 +24,11 @@ export class SouvenirLikesAdminService{
   }
 
   async delete(id:number){
-    const souvenirLike = await SouvenirLikes.findOneBy({id:id})
+    const souvenirLike = await this.repo.getOneById(id)
     if(!souvenirLike){
       throw new NotFoundException('No such souvenir image')
     }
-    await SouvenirLikes.remove(souvenirLike)
+    await this.repo.delete(souvenirLike)
     return {message: `Souvenir deleted successfully`};
   }
 

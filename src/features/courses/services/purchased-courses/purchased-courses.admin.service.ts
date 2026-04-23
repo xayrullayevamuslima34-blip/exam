@@ -1,29 +1,33 @@
-import {Body, Injectable, NotFoundException, Param} from "@nestjs/common";
-import {PurchasedCourses} from "../../entities/purchased-courses.entity";
-import {PurchasedCourseCreatePublicDto} from "../../dtos/purchased-courses/public/purchased-course.create.public.dto";
-import {PurchasedCourseUpdatePublicDto} from "../../dtos/purchased-courses/public/purchased-course.update.public.dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PurchasedCoursesFilter } from '../../filters/purchased-courses.filter';
+import { ConfigService } from '@nestjs/config';
+import { PurchasedCoursesRepository } from '../../repositories/purchased-courses.repository';
 
 @Injectable()
-export class PurchasedCoursesAdminService{
-    async getAll(){
-        return await PurchasedCourses.find()
-    }
+export class PurchasedCoursesAdminService {
 
-    async getOne(@Param(":id") id: string){
-        const purchased = await PurchasedCourses.findOneBy({id: +id})
-        if (!purchased){
-            throw new NotFoundException("Not found")
-        }
-        return purchased
-    }
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: PurchasedCoursesRepository) {
+  }
 
-    async delete(@Param("id") id: string){
-        const purchased = await PurchasedCourses.findOneBy({id: +id})
-        if (!purchased){
-            throw new NotFoundException("Not found")
-        }
-        await PurchasedCourses.remove(purchased)
-        return purchased
+  async getAll(filter: PurchasedCoursesFilter) {
+    return await this.repo.getAll(filter);
+  }
+
+  async getOne(id: number) {
+    const purchased = await this.repo.getOneById(id);
+    if (!purchased) {
+      throw new NotFoundException('Not found');
     }
+    return purchased;
+  }
+
+  async delete(id: number) {
+    const purchased = await this.repo.getOneById(id);
+    if (!purchased) {
+      throw new NotFoundException('Not found');
+    }
+    return await this.repo.delete(purchased);
+  }
 
 }

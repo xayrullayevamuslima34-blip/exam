@@ -6,47 +6,46 @@ import {
     Param,
     Patch,
     Post,
+    Query,
     Req,
     UploadedFile,
-    UseGuards,
     UseInterceptors
 } from "@nestjs/common";
 import {CourseCreateAdminDto} from "../../dtos/courses/admin/course.create.admin.dto";
 import {CourseUpdateAdminDto} from "../../dtos/courses/admin/course.update.admin.dto";
 import {CourseAdminService} from "../../services/course/course.admin.service";
 import type {Request} from "express";
-import {AuthenticationGuard} from "../../../../core/guards/authentication.guard";
-import {RolesGuard} from "../../../../core/guards/role.guard";
 import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {storageOptions} from "../../../../config/multer.config";
 import { CourseListAdminDto } from '../../dtos/courses/admin/course.list.admin.dto';
+import { PaginatedResult } from '../../../../core/paginatedResult.dto';
+import { CourseFilter } from '../../filters/course.filter';
 
 @ApiBearerAuth()
-@UseGuards(AuthenticationGuard, RolesGuard)
-@Roles(Role.Admin)
+@Roles(Role.Admin, Role.SuperAdmin)
 @Controller("admin/courses")
 export class CourseAdminController{
 
-    constructor(private readonly courseService: CourseAdminService) {}
+    constructor(private readonly courseService: CourseAdminService,) {}
 
-    @ApiOkResponse({type: [CourseListAdminDto], isArray: true})
+    @ApiOkResponse({type: [PaginatedResult]})
     @Get("list")
-    async getAll(@Req() request: Request){
+    async getAll(@Req() request: Request, @Query() filter: CourseFilter){
         let userId = undefined
         //@ts-ignore
         if (request.user){
             //@ts-ignore
             userId = request.user.id
         }
-        return this.courseService.getAll(userId)
+        return this.courseService.getAll(filter, userId)
     }
 
     @ApiOkResponse({type: [CourseListAdminDto]})
     @Get(":id")
-    async getOne(@Param(":id") id: string){
+    async getOne(@Param(":id") id: number){
         return this.courseService.getOne(id)
     }
 
@@ -58,12 +57,12 @@ export class CourseAdminController{
 
     @UseInterceptors(FileInterceptor('image', {storage: storageOptions}))
     @Patch("update/:id")
-    async update(@Param("id") id: string, @Body() payload: CourseUpdateAdminDto, @UploadedFile() image: Express.Multer.File){
+    async update(@Param("id") id: number, @Body() payload: CourseUpdateAdminDto, @UploadedFile() image: Express.Multer.File){
         return this.courseService.update(id, payload, image)
     }
 
     @Delete("delete/:id")
-    async delete(@Param("id") id: string){
+    async delete(@Param("id") id: number){
        return this.courseService.delete(id)
     }
 

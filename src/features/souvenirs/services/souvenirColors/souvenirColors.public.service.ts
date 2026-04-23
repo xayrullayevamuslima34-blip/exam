@@ -1,17 +1,23 @@
-import { Souvenirs } from '../../entities/souvenirs.entity';
-import { NotFoundError } from 'rxjs';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { SouvenirColorsFilter } from '../../filters/souvenirColors.filter';
+import { SouvenirColorsRepository } from '../../repositories/souvenirColors.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SouvenirColorsPublicService {
-  async getAll(){
-    return await Souvenirs.find();
+
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: SouvenirColorsRepository) {
+  }
+
+  async getAll(filter: SouvenirColorsFilter){
+    return await this.repo.getAll(filter);
   }
 
   async getOne(id:number){
-    const souvenir = await Souvenirs.findOneBy({id:id});
+    const souvenir = await this.repo.getOneById(id);
     if(!souvenir){
-      throw new NotFoundError("Souvenir not found");
+      throw new NotFoundException("Souvenir not found");
     }
     return souvenir;
   }

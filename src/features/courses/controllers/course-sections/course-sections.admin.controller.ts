@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards} from "@nestjs/common";
 import {CourseSectionCreateAdminDto} from "../../dtos/course-sections/admin/course-section.create.admin.dto";
 import {CourseSectionUpdateAdminDto} from "../../dtos/course-sections/admin/course-section.update.admin.dto";
 import {CourseSectionsAdminService} from "../../services/course-sections/course-sections.admin.service";
@@ -7,6 +7,7 @@ import {AuthenticationGuard} from "../../../../core/guards/authentication.guard"
 import {RolesGuard} from "../../../../core/guards/role.guard";
 import {Roles} from "../../../../core/decorators/roles.decorator";
 import {Role} from "../../../../core/enums/role.enum";
+import { CourseSectionsFilter } from '../../filters/course-sections.filter';
 
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, RolesGuard)
@@ -17,12 +18,12 @@ export class CourseSectionsAdminController{
     constructor(private readonly courseSectionService: CourseSectionsAdminService) {}
 
     @Get("list")
-    async getAll(){
-        return this.courseSectionService.getAll()
+    async getAll(@Query() filter: CourseSectionsFilter){
+        return this.courseSectionService.getAll(filter)
     }
 
     @Get(":id")
-    async getOne(@Param("id") id: string){
+    async getOne(@Param("id") id: number){
         return this.courseSectionService.getOne(id)
     }
 
@@ -32,12 +33,12 @@ export class CourseSectionsAdminController{
     }
 
     @Patch("update/:id")
-    async update(@Param("id") id: string, @Body() payload: CourseSectionUpdateAdminDto){
+    async update(@Param("id") id: number, @Body() payload: CourseSectionUpdateAdminDto){
         return this.courseSectionService.update(id, payload)
     }
 
     @Delete("delete/:id")
-    async delete(@Param("id") id: string){
+    async delete(@Param("id") id: number){
         return this.courseSectionService.delete(id)
     }
 

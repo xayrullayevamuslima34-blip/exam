@@ -1,22 +1,10 @@
 import { IsOptional, IsString } from 'class-validator';
+import { PaginationFilters } from '../../../core/filters/pagination.filter';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 
-export class CourseFilter{
+export class CourseFilter extends PaginationFilters {
   @IsString()
   @IsOptional()
-  @ApiProperty()
+  @ApiProperty({ required: false })
   search?: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty()
-  @Type(() => Number)
-  page?: number;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty()
-  @Type(() => Number)
-  size?: number;
 }

@@ -1,47 +1,53 @@
-import {Body, Injectable, NotFoundException, Param} from "@nestjs/common";
-import {BookReview} from "../../entities/book-review.entity";
-import {BookReviewCreateAdminDto} from "../../dtos/book-review/admin /book-review.create.admin.dto";
-import {BookReviewUpdateAdminDto} from "../../dtos/book-review/admin /book-review.update.admin.dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { BookReview } from '../../entities/book-review.entity';
+import { BookReviewCreateAdminDto } from '../../dtos/book-review/admin /book-review.create.admin.dto';
+import { BookReviewUpdateAdminDto } from '../../dtos/book-review/admin /book-review.update.admin.dto';
+import { BookReviewFilter } from '../../filters/book-review.filter';
+import { ConfigService } from '@nestjs/config';
+import { BookReviewRepository } from '../../repositories/book-review.repository';
 
 @Injectable()
-export class BookReviewAdminService{
-    async getAll(){
-        return await BookReview.find()
+export class BookReviewAdminService {
+
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: BookReviewRepository) {
+  }
+
+  async getAll(filter: BookReviewFilter) {
+    return await this.repo.getAll(filter);
+  }
+
+  async getOne(id: number) {
+    const review = await this.repo.getOneById(id);
+    if (!review) {
+      throw new NotFoundException('Book not found');
+    }
+    return review;
+  }
+
+  async create(payload: BookReviewCreateAdminDto) {
+    const review = await BookReview.create(payload as BookReview);
+    return await this.repo.save(review);
+  }
+
+  async update(id: number, payload: BookReviewUpdateAdminDto) {
+    const review = await this.repo.getOneById(id);
+    if (!review) {
+      throw new NotFoundException('Book not found');
     }
 
-    async getOne(@Param("id") id: string){
-        const review = await BookReview.findOneBy({id: +id})
-        if(!review){
-            throw new NotFoundException("Book not found")
-        }
-        return review
+    Object.assign(review, payload);
+    return await this.repo.save(review);
+  }
+
+  async delete(id: number) {
+    const review = await this.repo.getOneById(id);
+    if (!review) {
+      throw new NotFoundException('Book not found');
     }
 
-    async create(@Body() payload: BookReviewCreateAdminDto){
-        const review = await BookReview.create(payload as BookReview)
-        await BookReview.save(review)
-        return review
-    }
-
-    async update(@Param("id") id: string, @Body() payload: BookReviewUpdateAdminDto){
-        const review = await BookReview.findOneBy({id: +id})
-        if(!review){
-            throw new NotFoundException("Book not found")
-        }
-
-        Object.assign(review, payload)
-        await BookReview.save(review)
-        return review
-    }
-
-    async delete(@Param("id") id: string){
-        const review = await BookReview.findOneBy({id: +id})
-        if(!review){
-            throw new NotFoundException("Book not found")
-        }
-
-        await BookReview.remove(review)
-        return {message: "Deleted successfully"}
-    }
+    await this.repo.delete(review);
+    return { message: 'Deleted successfully' };
+  }
 
 }

@@ -1,29 +1,35 @@
-import {Body, Injectable, NotFoundException, Param} from "@nestjs/common";
-import {CourseLikes} from "../../entities/course-likes.entity";
-import {CourseLikeCreateAdminDto} from "../../dtos/course-likes/admin/course-like.create.admin.dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CourseLikesFilter } from '../../filters/course-likes.filter';
+import { ConfigService } from '@nestjs/config';
+import { CourseLikesRepository } from '../../repositories/course-likes.repository';
 
 @Injectable()
-export class CourseLikesAdminService{
-    async getAll(){
-        return await CourseLikes.find()
-    }
+export class CourseLikesAdminService {
 
-    async getOne(@Param("id") id: string){
-        const like = await CourseLikes.findOneBy({id: +id})
-        if (!like){
-            throw new NotFoundException("Course not found")
-        }
-        return like
-    }
+  constructor(protected readonly config: ConfigService,
+              protected readonly repo: CourseLikesRepository) {
+  }
 
-    async delete(@Param("id") id: string){
-        const like = await CourseLikes.findOneBy({id: +id})
-        if (!like){
-            throw new NotFoundException("Course like not found")
-        }
-        await CourseLikes.remove(like)
-        return {message: "Course like deleted successfully"}
+  async getAll(filter: CourseLikesFilter) {
+    return await this.repo.getAll(filter);
+  }
+
+  async getOne(id: number) {
+    const like = await this.repo.getOneById(id);
+    if (!like) {
+      throw new NotFoundException('Course not found');
     }
+    return like;
+  }
+
+  async delete(id: number) {
+    const like = await this.repo.getOneById(id);
+    if (!like) {
+      throw new NotFoundException('Course like not found');
+    }
+    await this.repo.delete(like);
+    return { message: 'Course like deleted successfully' };
+  }
 
 
 }

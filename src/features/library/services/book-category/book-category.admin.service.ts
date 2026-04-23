@@ -1,44 +1,50 @@
-import {Body, Injectable, NotFoundException, Param} from "@nestjs/common";
+import {Injectable, NotFoundException} from "@nestjs/common";
 import {BookCategory} from "../../entities/book-category.entity";
 import {BookCategoryCreateAdminDto} from "../../dtos/book-category/admin/book-category.create.admin.dto";
 import {BookCategoryUpdateAdminDto} from "../../dtos/book-category/admin/book-category.update.admin.dto";
+import { BookCategoryFilter } from '../../filters/book-category.filter';
+import { ConfigService } from '@nestjs/config';
+import { BookCategoryRepository } from '../../repositories/book-category.repository';
 
 @Injectable()
 export class BookCategoryAdminService{
-    async getAll(){
-        return await BookCategory.find()
+
+    constructor(protected readonly config: ConfigService,
+                protected readonly repo: BookCategoryRepository) {
     }
 
-    async getOne(@Param("id") id: string){
-        const category = await BookCategory.findOneBy({id: +id})
+    async getAll(filter: BookCategoryFilter){
+        return await this.repo.getAll(filter)
+    }
+
+    async getOne(id: number){
+        const category = await this.repo.getOneById(id)
         if(!category){
             throw new NotFoundException("Category not found")
         }
         return category
     }
 
-    async create(@Body() payload: BookCategoryCreateAdminDto){
+    async create(payload: BookCategoryCreateAdminDto){
         const category = BookCategory.create(payload as BookCategory)
-        await BookCategory.save(category)
-        return category
+        return await this.repo.save(category)
     }
 
-    async update(@Param("id") id: string, @Body() payload: BookCategoryUpdateAdminDto){
-        const category = await BookCategory.findOneBy({id: +id})
+    async update(id: number, payload: BookCategoryUpdateAdminDto){
+        const category = await this.repo.getOneById(id)
         if(!category){
             throw new NotFoundException("Category not found")
         }
         Object.assign(category, payload)
-        await BookCategory.save(category)
-        return category
+        return await this.repo.save(category)
     }
 
-    async delete(@Param("id") id: string){
-        const category = await BookCategory.findOneBy({id: +id})
+    async delete(id: number){
+        const category = await this.repo.getOneById(id)
         if(!category){
             throw new NotFoundException("Category not found")
         }
-        await BookCategory.remove(category)
+        await this.repo.delete(category)
         return {message: "Deleted successfully"}
     }
 }

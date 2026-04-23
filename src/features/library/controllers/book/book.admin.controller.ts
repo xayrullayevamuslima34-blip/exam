@@ -6,24 +6,23 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { BookCreateAdminDto } from '../../dtos/book/admin/book.create.admin.dto';
 import { BookUpdateAdminDto } from '../../dtos/book/admin/book.update.admin.dto';
 import { BookAdminService } from '../../services/book/book.admin.service';
 import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
-import { AuthenticationGuard } from '../../../../core/guards/authentication.guard';
-import { RolesGuard } from '../../../../core/guards/role.guard';
 import { Roles } from '../../../../core/decorators/roles.decorator';
 import { Role } from '../../../../core/enums/role.enum';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { storageOptions } from '../../../../config/multer.config';
 import { BookListAdminDto } from '../../dtos/book/admin/book.list.admin.dto';
+import { PaginatedResult } from '../../../../core/paginatedResult.dto';
+import { BookFilter } from '../../filters/book.filter';
 
 @ApiBearerAuth()
-@UseGuards(AuthenticationGuard, RolesGuard)
 @Roles(Role.Admin)
 @Controller('admin/book')
 export class BookAdminController {
@@ -31,15 +30,15 @@ export class BookAdminController {
   constructor(private readonly bookService: BookAdminService) {
   }
 
-  @ApiOkResponse({type: [BookListAdminDto], isArray: true})
+  @ApiOkResponse({type: [PaginatedResult]})
   @Get('list')
-  async getAll() {
-    return this.bookService.getAll();
+  async getAll(@Query() filters: BookFilter) {
+    return this.bookService.getAll(filters);
   }
 
   @ApiOkResponse({type: [BookListAdminDto]})
   @Get(':id')
-  async getOne(@Param('id') id: string) {
+  async getOne(@Param('id') id: number) {
     return this.bookService.getOne(id);
   }
 
@@ -51,12 +50,12 @@ export class BookAdminController {
 
   @UseInterceptors(FileInterceptor('image', { storage: storageOptions }))
   @Patch('update/:id')
-  async update(@Param('id') id: string, @Body() payload: BookUpdateAdminDto, @UploadedFile() image: Express.Multer.File) {
+  async update(@Param('id') id: number, @Body() payload: BookUpdateAdminDto, @UploadedFile() image: Express.Multer.File) {
     return this.bookService.update(id, payload, image);
   }
 
   @Delete('delete/:id')
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id') id: number) {
     return this.bookService.delete(id);
   }
 
